@@ -5,7 +5,7 @@ import { authService } from '../services/auth.service';
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (payload: LoginPayload) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<User>;
   logout: () => Promise<void>;
 }
 
@@ -28,11 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function login(payload: LoginPayload) {
+  async function login(payload: LoginPayload): Promise<User> {
     const result = await authService.login(payload);
     localStorage.setItem('accessToken', result.accessToken);
     localStorage.setItem('refreshToken', result.refreshToken);
     setUser(result.user);
+    return result.user;
   }
 
   async function logout() {

@@ -1,26 +1,32 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { UserRole } from '../types';
+
+function homeFor(role: string) {
+  return role === UserRole.ADMIN ? '/users' : '/dashboard';
+}
 
 export function LoginPage() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { login, user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  // Reativo: quando user é commitado no contexto, redireciona pela role
+  if (!authLoading && user) return <Navigate to={homeFor(user.role)} replace />;
+
+  async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSubmitting(true);
     try {
       await login({ email, password });
-      navigate('/dashboard');
     } catch {
       setError('E-mail ou senha inválidos.');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -68,10 +74,10 @@ export function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-300 text-white text-sm font-medium rounded-lg transition-colors mt-2"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {submitting ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
         </div>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -7,13 +7,9 @@ import { renderWithProviders } from '../../test/render-helpers';
 import { server } from '../../test/mocks/server';
 import { authResponse } from '../../test/mocks/fixtures';
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: () => mockNavigate };
-});
-
 describe('LoginPage', () => {
+  afterEach(() => localStorage.clear());
+
   it('renders the login form', () => {
     renderWithProviders(<LoginPage />);
 
@@ -22,7 +18,7 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
   });
 
-  it('navigates to dashboard on successful login', async () => {
+  it('removes the form after successful login (redirect happened)', async () => {
     renderWithProviders(<LoginPage />);
     const user = userEvent.setup();
 
@@ -30,7 +26,9 @@ describe('LoginPage', () => {
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123');
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /entrar/i })).not.toBeInTheDocument(),
+    );
   });
 
   it('shows error message on failed login', async () => {

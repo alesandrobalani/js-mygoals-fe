@@ -1,8 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,19 +12,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
     navigate('/login');
   }
 
-  const navLinks = [
-    { to: '/dashboard', label: 'Dashboard' },
-    ...(user?.role === UserRole.ADMIN ? [{ to: '/users', label: 'Usuários' }] : []),
-  ];
+  const navLinks =
+    user?.role === UserRole.ADMIN
+      ? [{ to: '/users', label: 'Usuários' }]
+      : [{ to: '/dashboard', label: 'Dashboard' }];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       <header className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link to="/dashboard" className="text-sky-600 font-bold text-lg tracking-tight">
-              MyGoals
-            </Link>
+            <span className="text-sky-600 font-bold text-lg tracking-tight">MyGoals</span>
             <nav className="flex gap-1">
               {navLinks.map((link) => (
                 <Link
@@ -52,7 +50,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">{children}</main>
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+        <Outlet />
+      </main>
     </div>
   );
 }

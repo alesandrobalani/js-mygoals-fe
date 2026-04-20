@@ -6,3 +6,4 @@ Este projeto visa atender um front end para ser utilizado no desktop Web, e tamb
 Construa um designe de cores clean.
 Neste momento deve ser criada a funcionalidade de autenticação de usuário, e as telas de gestão de usuários.
 Crie a estrutura contempando os testes automatizados.
+Os menus da aplicação devem ser apresentados conforme a role do usuário autenticado, o usuário admin terá permissão apenas para acessar os recursos de de administração de usuários, já os que não administradores terão acesso ao dashboard de transações.

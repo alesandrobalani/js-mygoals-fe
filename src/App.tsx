@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminRoute } from './components/AdminRoute';
+import { UserRoute } from './components/UserRoute';
 import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -12,38 +14,29 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Rota pública */}
           <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <DashboardPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/users"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <UsersPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/users/new"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <CreateUserPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Rotas protegidas — Layout persiste entre navegações */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+
+              {/* Somente admin */}
+              <Route element={<AdminRoute />}>
+                <Route path="/users" element={<UsersPage />} />
+                <Route path="/users/new" element={<CreateUserPage />} />
+              </Route>
+
+              {/* Somente não-admin */}
+              <Route element={<UserRoute />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+              </Route>
+
+            </Route>
+          </Route>
+
+          {/* Qualquer rota desconhecida vai para /login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
