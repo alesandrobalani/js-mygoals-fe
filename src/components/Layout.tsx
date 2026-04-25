@@ -1,6 +1,7 @@
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
+import { LayoutView } from './Layout.view';
 
 export function Layout() {
   const { user, logout } = useAuth();
@@ -18,41 +19,11 @@ export function Layout() {
       : [{ to: '/dashboard', label: 'Dashboard' }];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <span className="text-sky-600 font-bold text-lg tracking-tight">MyGoals</span>
-            <nav className="flex gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname.startsWith(link.to)
-                      ? 'bg-sky-50 text-sky-700'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500">{user?.name}</span>
-            <button
-              onClick={handleLogout}
-              className="text-sm px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
-            >
-              Sair
-            </button>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
-        <Outlet />
-      </main>
-    </div>
+    <LayoutView
+      userName={user?.name}
+      navLinks={navLinks}
+      activePath={location.pathname}
+      onLogout={handleLogout}
+    />
   );
 }

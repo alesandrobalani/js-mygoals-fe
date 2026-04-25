@@ -35,3 +35,8 @@ export interface RegisterPayload {
   name: string;
   role?: UserRole;
 }
+
+export interface TransactionSummary {
+  income: number;
+  expense: number;
+}

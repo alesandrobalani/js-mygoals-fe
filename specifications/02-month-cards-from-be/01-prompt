@@ -1,0 +1,4 @@
+Alterar a dashboard page para que os cards de saldo e receita e despesa do mes sejam preenchidos com os dados vindos do back end.
+O controller com a interface é C:\dev\js-mygoals-be\src\modules\transactions\transactions.controller.tsm, e o método é o getSummary.
+Ajuste o dash para buscar os dados do mês corrente.
+Crie os testes automatizados de happy e badflows. Nos BadFlows considere situação em que o back end de erro inesperado.

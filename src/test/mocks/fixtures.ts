@@ -1,4 +1,4 @@
-import { UserRole, type User, type AuthResponse } from '../../types';
+import { UserRole, type User, type AuthResponse, type TransactionSummary } from '../../types';
 
 export const adminUser: User = {
   id: 'user-admin-1',
@@ -23,3 +23,8 @@ export const authResponse: AuthResponse = {
 };
 
 export const usersList: User[] = [adminUser, regularUser];
+
+export const transactionSummary: TransactionSummary = {
+  income: 5000,
+  expense: 2000,
+};
