@@ -7,13 +7,20 @@ interface StatCard {
 interface DashboardViewProps {
   userName: string | undefined;
   cards: StatCard[];
+  error: string;
 }
 
-export function DashboardView({ userName, cards }: DashboardViewProps) {
+export function DashboardView({ userName, cards, error }: DashboardViewProps) {
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-2">Olá, {userName}!</h1>
       <p className="text-slate-500 mb-8">Bem-vindo ao MyGoals — seu controle financeiro familiar.</p>
+
+      {error && (
+        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {cards.map((card) => (
