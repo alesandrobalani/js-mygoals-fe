@@ -15,6 +15,8 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Gestão de usuários: listagem e criação (apenas Admin)
 - Rotas protegidas por JWT
 - Layout responsivo para Web desktop e Mobile Android
+- Dashboard financeiro com cards de saldo, receitas e despesas do mês
+- Grid de transações do mês corrente com paginação (20 / 50 / 100 registros por página)
 
 ## Pré-requisitos
 
@@ -56,8 +58,8 @@ npm run preview
 ```
 src/
   contexts/     # AuthContext (estado de autenticação global)
-  components/   # Layout, ProtectedRoute
+  components/   # Layout, ProtectedRoute, TransactionsGrid
   pages/        # LoginPage, DashboardPage, UsersPage, CreateUserPage
-  services/     # api.ts (axios), auth.service.ts, users.service.ts
+  services/     # api.ts (axios), auth.service.ts, users.service.ts, transactions.service.ts
   types/        # Tipagens compartilhadas
 ```

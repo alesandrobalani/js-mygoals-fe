@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { adminUser, authResponse, transactionSummary, usersList } from './fixtures';
+import { adminUser, authResponse, paginatedTransactions, transactionSummary, usersList } from './fixtures';
 
 const BASE = 'http://localhost:3000';
 
@@ -41,5 +41,9 @@ export const handlers = [
 
   http.get(`${BASE}/transactions/summary`, () => {
     return HttpResponse.json(transactionSummary);
+  }),
+
+  http.get(`${BASE}/transactions/search`, () => {
+    return HttpResponse.json(paginatedTransactions);
   }),
 ];

@@ -1,0 +1,6 @@
+Vamos adicionar no dashboard a funcionalidade de criar transações.
+Para isto vamos iniciar criando um grid que apresenta os dados de transação do mês corrente.
+Este GRID deve ser paginado, por padrão deve ser apresentados 20 registros, mas o usuário pode solicitar 50 ou 100 registros.
+A busca deve ser feita através do método search do controller C:\dev\js-mygoals-be\src\modules\transactions\transactions.controller.ts.
+Devem ser criados os testes automatizados de happy e bad flows.
+Deve ser atualizado o README.

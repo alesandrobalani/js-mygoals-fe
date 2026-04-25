@@ -1,4 +1,12 @@
-import { UserRole, type User, type AuthResponse, type TransactionSummary } from '../../types';
+import {
+  UserRole,
+  TransactionType,
+  type User,
+  type AuthResponse,
+  type TransactionSummary,
+  type Transaction,
+  type PaginatedTransactions,
+} from '../../types';
 
 export const adminUser: User = {
   id: 'user-admin-1',
@@ -27,4 +35,42 @@ export const usersList: User[] = [adminUser, regularUser];
 export const transactionSummary: TransactionSummary = {
   income: 5000,
   expense: 2000,
+};
+
+export const transactionsList: Transaction[] = [
+  {
+    id: 'tx-1',
+    description: 'Salário',
+    amount: 5000,
+    type: TransactionType.INCOME,
+    category: { id: 'cat-1', name: 'Renda' },
+    transactionDate: '2026-04-05T00:00:00.000Z',
+    updatedAt: '2026-04-05T00:00:00.000Z',
+  },
+  {
+    id: 'tx-2',
+    description: 'Supermercado',
+    amount: 800,
+    type: TransactionType.EXPENSE,
+    category: { id: 'cat-2', name: 'Alimentação' },
+    transactionDate: '2026-04-10T00:00:00.000Z',
+    updatedAt: '2026-04-10T00:00:00.000Z',
+  },
+  {
+    id: 'tx-3',
+    description: 'Conta de luz',
+    amount: 200,
+    type: TransactionType.EXPENSE,
+    category: { id: 'cat-3', name: 'Contas' },
+    transactionDate: '2026-04-15T00:00:00.000Z',
+    updatedAt: '2026-04-15T00:00:00.000Z',
+  },
+];
+
+export const paginatedTransactions: PaginatedTransactions = {
+  data: transactionsList,
+  total: 3,
+  page: 1,
+  limit: 20,
+  totalPages: 1,
 };

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
+import { TransactionsGrid } from '../components/TransactionsGrid';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -50,5 +51,10 @@ export function DashboardPage() {
     { label: 'Despesas do mês', value: formatCurrency(expense), color: 'text-red-500' },
   ];
 
-  return <DashboardView userName={user?.name} cards={cards} error={error} />;
+  return (
+    <>
+      <DashboardView userName={user?.name} cards={cards} error={error} />
+      <TransactionsGrid />
+    </>
+  );
 }
