@@ -18,6 +18,7 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Dashboard financeiro com cards de saldo, receitas e despesas do mês
 - Grid de transações do mês corrente com paginação (20 / 50 / 100 registros por página)
 - Criação de transações via modal no dashboard (com atualização automática do grid e resumo)
+- Criação rápida de categoria inline no modal de transação
 
 ## Pré-requisitos
 

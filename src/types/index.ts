@@ -61,6 +61,7 @@ export interface Transaction {
   category: TransactionCategory;
   transactionDate: string;
   updatedAt: string;
+  dueDate: string;
 }
 
 export interface PaginatedTransactions {

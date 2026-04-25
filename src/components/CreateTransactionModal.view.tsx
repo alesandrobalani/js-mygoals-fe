@@ -27,6 +27,7 @@ interface CreateTransactionModalViewProps {
   onDueDateChange: (v: string) => void;
   onSubmit: () => void;
   onClose: () => void;
+  onOpenQuickCategory: () => void;
 }
 
 const inputClass =
@@ -60,6 +61,7 @@ export function CreateTransactionModalView({
   onDueDateChange,
   onSubmit,
   onClose,
+  onOpenQuickCategory,
 }: CreateTransactionModalViewProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -120,18 +122,29 @@ export function CreateTransactionModalView({
           {/* Categoria */}
           <div>
             <label htmlFor="tx-category" className={labelClass}>Categoria *</label>
-            <select
-              id="tx-category"
-              className={inputClass}
-              value={categoryId}
-              onChange={(e) => onCategoryChange(e.target.value)}
-              disabled={loadingOptions || submitting}
-            >
-              <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                id="tx-category"
+                className={inputClass}
+                value={categoryId}
+                onChange={(e) => onCategoryChange(e.target.value)}
+                disabled={loadingOptions || submitting}
+              >
+                <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={onOpenQuickCategory}
+                disabled={submitting}
+                title="Nova categoria"
+                className="px-3 py-2 text-sky-600 border border-slate-300 rounded-lg hover:bg-sky-50 disabled:opacity-40 text-sm font-bold shrink-0"
+              >
+                +
+              </button>
+            </div>
           </div>
 
           {/* Conta */}

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { categoriesService } from '../categories.service';
-import { categoriesList } from '../../test/mocks/fixtures';
+import { categoriesList, createdCategory } from '../../test/mocks/fixtures';
 import { server } from '../../test/mocks/server';
 
 describe('categoriesService', () => {
@@ -25,6 +25,25 @@ describe('categoriesService', () => {
       );
 
       await expect(categoriesService.getAll()).rejects.toThrow();
+    });
+  });
+
+  describe('create', () => {
+    it('returns the created category', async () => {
+      const result = await categoriesService.create({ name: createdCategory.name });
+
+      expect(result.id).toBe(createdCategory.id);
+      expect(result.name).toBe(createdCategory.name);
+    });
+
+    it('throws when the backend returns an unexpected error', async () => {
+      server.use(
+        http.post('http://localhost:3000/categories', () =>
+          HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+        ),
+      );
+
+      await expect(categoriesService.create({ name: 'Lazer' })).rejects.toThrow();
     });
   });
 });

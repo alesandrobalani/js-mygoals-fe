@@ -6,6 +6,7 @@ import { categoriesService } from '../services/categories.service';
 import { accountsService } from '../services/accounts.service';
 import { transactionItemsService } from '../services/transaction-items.service';
 import { CreateTransactionModalView } from './CreateTransactionModal.view';
+import { CreateCategoryQuickModal } from './CreateCategoryQuickModal';
 
 interface CreateTransactionModalProps {
   onClose: () => void;
@@ -29,6 +30,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [isQuickCategoryOpen, setIsQuickCategoryOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -44,6 +46,12 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
       .catch(() => setError('Erro ao carregar opções do formulário.'))
       .finally(() => setLoadingOptions(false));
   }, []);
+
+  function handleCategoryCreated(newCategory: TransactionCategory) {
+    setCategories((prev) => [...prev, newCategory]);
+    setCategoryId(newCategory.id);
+    setIsQuickCategoryOpen(false);
+  }
 
   const isValid =
     amount !== '' &&
@@ -78,32 +86,41 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
   }
 
   return (
-    <CreateTransactionModalView
-      type={type}
-      amount={amount}
-      transactionDate={transactionDate}
-      categoryId={categoryId}
-      accountId={accountId}
-      transactionItemId={transactionItemId}
-      description={description}
-      dueDate={dueDate}
-      categories={categories}
-      accounts={accounts}
-      transactionItems={transactionItems}
-      loadingOptions={loadingOptions}
-      submitting={submitting}
-      error={error}
-      isValid={isValid}
-      onTypeChange={setType}
-      onAmountChange={setAmount}
-      onTransactionDateChange={setTransactionDate}
-      onCategoryChange={setCategoryId}
-      onAccountChange={setAccountId}
-      onTransactionItemChange={setTransactionItemId}
-      onDescriptionChange={setDescription}
-      onDueDateChange={setDueDate}
-      onSubmit={handleSubmit}
-      onClose={onClose}
-    />
+    <>
+      <CreateTransactionModalView
+        type={type}
+        amount={amount}
+        transactionDate={transactionDate}
+        categoryId={categoryId}
+        accountId={accountId}
+        transactionItemId={transactionItemId}
+        description={description}
+        dueDate={dueDate}
+        categories={categories}
+        accounts={accounts}
+        transactionItems={transactionItems}
+        loadingOptions={loadingOptions}
+        submitting={submitting}
+        error={error}
+        isValid={isValid}
+        onTypeChange={setType}
+        onAmountChange={setAmount}
+        onTransactionDateChange={setTransactionDate}
+        onCategoryChange={setCategoryId}
+        onAccountChange={setAccountId}
+        onTransactionItemChange={setTransactionItemId}
+        onDescriptionChange={setDescription}
+        onDueDateChange={setDueDate}
+        onSubmit={handleSubmit}
+        onClose={onClose}
+        onOpenQuickCategory={() => setIsQuickCategoryOpen(true)}
+      />
+      {isQuickCategoryOpen && (
+        <CreateCategoryQuickModal
+          onClose={() => setIsQuickCategoryOpen(false)}
+          onSuccess={handleCategoryCreated}
+        />
+      )}
+    </>
   );
 }

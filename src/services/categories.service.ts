@@ -6,4 +6,9 @@ export const categoriesService = {
     const { data } = await api.get<TransactionCategory[]>('/categories');
     return data;
   },
+
+  async create(payload: { name: string; description?: string }): Promise<TransactionCategory> {
+    const { data } = await api.post<TransactionCategory>('/categories', payload);
+    return data;
+  },
 };

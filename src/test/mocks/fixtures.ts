@@ -48,6 +48,7 @@ export const transactionsList: Transaction[] = [
     type: TransactionType.INCOME,
     category: { id: 'cat-1', name: 'Renda' },
     transactionDate: '2026-04-05T00:00:00.000Z',
+    dueDate: '2026-04-05T00:00:00.000Z',
     updatedAt: '2026-04-05T00:00:00.000Z',
   },
   {
@@ -57,6 +58,7 @@ export const transactionsList: Transaction[] = [
     type: TransactionType.EXPENSE,
     category: { id: 'cat-2', name: 'Alimentação' },
     transactionDate: '2026-04-10T00:00:00.000Z',
+    dueDate: '2026-04-10T00:00:00.000Z',
     updatedAt: '2026-04-10T00:00:00.000Z',
   },
   {
@@ -66,6 +68,7 @@ export const transactionsList: Transaction[] = [
     type: TransactionType.EXPENSE,
     category: { id: 'cat-3', name: 'Contas' },
     transactionDate: '2026-04-15T00:00:00.000Z',
+    dueDate: '2026-04-17T00:00:00.000Z',
     updatedAt: '2026-04-15T00:00:00.000Z',
   },
 ];
@@ -94,6 +97,11 @@ export const transactionItemsList: TransactionItem[] = [
   { id: 'item-2', name: 'Compras gerais', updatedAt: '2026-01-01T00:00:00.000Z' },
 ];
 
+export const createdCategory: TransactionCategory = {
+  id: 'cat-new',
+  name: 'Nova Cat',
+};
+
 export const createdTransaction: Transaction = {
   id: 'tx-new',
   description: 'Nova despesa',
@@ -101,5 +109,6 @@ export const createdTransaction: Transaction = {
   type: TransactionType.EXPENSE,
   category: categoriesList[1],
   transactionDate: '2026-04-20T00:00:00.000Z',
+  dueDate: '2026-04-25T00:00:00.000Z',
   updatedAt: '2026-04-20T00:00:00.000Z',
 };

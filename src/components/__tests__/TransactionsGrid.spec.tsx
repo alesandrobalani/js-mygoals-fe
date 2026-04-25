@@ -21,6 +21,7 @@ describe('TransactionsGrid', () => {
         expect(screen.getByText('Descrição')).toBeInTheDocument();
         expect(screen.getByText('Tipo')).toBeInTheDocument();
         expect(screen.getByText('Valor')).toBeInTheDocument();
+        expect(screen.getByText('Vencimento')).toBeInTheDocument();
       });
     });
 

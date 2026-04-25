@@ -4,6 +4,7 @@ import {
   adminUser,
   authResponse,
   categoriesList,
+  createdCategory,
   createdTransaction,
   paginatedTransactions,
   transactionItemsList,
@@ -63,6 +64,10 @@ export const handlers = [
 
   http.get(`${BASE}/categories`, () => {
     return HttpResponse.json(categoriesList);
+  }),
+
+  http.post(`${BASE}/categories`, () => {
+    return HttpResponse.json(createdCategory, { status: 201 });
   }),
 
   http.get(`${BASE}/accounts`, () => {

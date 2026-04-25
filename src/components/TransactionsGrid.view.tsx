@@ -60,6 +60,7 @@ export function TransactionsGridView({
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Descrição</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Tipo</th>
                 <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
+                <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +86,7 @@ export function TransactionsGridView({
                   >
                     {formatCurrency(tx.amount)}
                   </td>
+                  <td className="px-6 py-4 text-slate-500">{formatDate(tx.dueDate)}</td>
                 </tr>
               ))}
             </tbody>
