@@ -13,7 +13,7 @@ function getCurrentMonthRange(): { startDate: string; endDate: string } {
   };
 }
 
-export function TransactionsGrid() {
+export function TransactionsGrid({ refreshKey = 0 }: { refreshKey?: number }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -35,7 +35,7 @@ export function TransactionsGrid() {
       })
       .catch(() => setError('Erro ao carregar transações.'))
       .finally(() => setLoading(false));
-  }, [page, limit]);
+  }, [page, limit, refreshKey]);
 
   function handleLimitChange(newLimit: number) {
     setLimit(newLimit);

@@ -8,12 +8,21 @@ interface DashboardViewProps {
   userName: string | undefined;
   cards: StatCard[];
   error: string;
+  onOpenModal: () => void;
 }
 
-export function DashboardView({ userName, cards, error }: DashboardViewProps) {
+export function DashboardView({ userName, cards, error, onOpenModal }: DashboardViewProps) {
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2">Olá, {userName}!</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-slate-800">Olá, {userName}!</h1>
+        <button
+          onClick={onOpenModal}
+          className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          + Nova Transação
+        </button>
+      </div>
       <p className="text-slate-500 mb-8">Bem-vindo ao MyGoals — seu controle financeiro familiar.</p>
 
       {error && (

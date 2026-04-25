@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { transactionsService } from '../transactions.service';
-import { paginatedTransactions, transactionSummary } from '../../test/mocks/fixtures';
+import { createdTransaction, paginatedTransactions, transactionSummary } from '../../test/mocks/fixtures';
 import { server } from '../../test/mocks/server';
 
 describe('transactionsService', () => {
@@ -49,6 +49,42 @@ describe('transactionsService', () => {
 
       await expect(
         transactionsService.search('2026-04-01', '2026-04-30', 1, 20),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('create', () => {
+    it('returns the created transaction', async () => {
+      const result = await transactionsService.create({
+        type: createdTransaction.type,
+        amount: createdTransaction.amount,
+        transactionDate: createdTransaction.transactionDate,
+        categoryId: createdTransaction.category.id,
+        accountId: 'acc-1',
+        transactionItemId: 'item-1',
+        description: createdTransaction.description,
+      });
+
+      expect(result.id).toBe(createdTransaction.id);
+      expect(result.amount).toBe(createdTransaction.amount);
+    });
+
+    it('throws when the backend returns an unexpected error', async () => {
+      server.use(
+        http.post('http://localhost:3000/transactions', () =>
+          HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+        ),
+      );
+
+      await expect(
+        transactionsService.create({
+          type: 'expense',
+          amount: 100,
+          transactionDate: '2026-04-20',
+          categoryId: 'cat-1',
+          accountId: 'acc-1',
+          transactionItemId: 'item-1',
+        }),
       ).rejects.toThrow();
     });
   });

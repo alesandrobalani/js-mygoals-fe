@@ -70,3 +70,26 @@ export interface PaginatedTransactions {
   limit: number;
   totalPages: number;
 }
+
+export interface Account {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
+export interface TransactionItem {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
+export interface CreateTransactionPayload {
+  description?: string;
+  amount: number;
+  type: TransactionType;
+  categoryId: string;
+  transactionItemId: string;
+  accountId: string;
+  transactionDate: string;
+  dueDate?: string;
+}
