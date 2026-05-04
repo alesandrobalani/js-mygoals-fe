@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
+import { TransactionsGrid } from '../components/TransactionsGrid';
+import { CreateTransactionModal } from '../components/CreateTransactionModal';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -25,6 +27,8 @@ export function DashboardPage() {
   const [expenseNotSettled, setExpenseNotSettled] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const { startDate, endDate } = getCurrentMonthRange();
@@ -38,7 +42,12 @@ export function DashboardPage() {
       })
       .catch(() => setError('Erro ao carregar resumo financeiro.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
+
+  function handleTransactionCreated() {
+    setRefreshKey((k) => k + 1);
+    setLoading(true);
+  }
 
   if (loading) {
     return (
@@ -57,5 +66,21 @@ export function DashboardPage() {
     { label: 'Saldo efetivado total', value: formatCurrency(incomeSettled - expenseSettled), color: 'text-sky-600' },
   ];
 
-  return <DashboardView userName={user?.name} cards={cards} error={error} />;
+  return (
+    <>
+      <DashboardView
+        userName={user?.name}
+        cards={cards}
+        error={error}
+        onOpenModal={() => setIsModalOpen(true)}
+      />
+      <TransactionsGrid refreshKey={refreshKey} />
+      {isModalOpen && (
+        <CreateTransactionModal
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={handleTransactionCreated}
+        />
+      )}
+    </>
+  );
 }

@@ -1,0 +1,6 @@
+Crie na página de dashboard um botão para adicionar transações.
+Crie um modal para a inserir uma nova transação, considerando as obrigatoriedades dos campos.
+O modal deve ter uma boa usabilidade ao usuário.
+Ao inserir o registro o GRID do Dashboard deve ser atualizado.
+Crie os testes automatizados.
+Atualize o README.
