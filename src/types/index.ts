@@ -37,6 +37,8 @@ export interface RegisterPayload {
 }
 
 export interface TransactionSummary {
-  income: number;
-  expense: number;
+  incomeSettled: number;
+  incomeNotSettled: number;
+  expenseSettled: number;
+  expenseNotSettled: number;
 }

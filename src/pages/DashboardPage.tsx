@@ -19,8 +19,10 @@ function getCurrentMonthRange(): { startDate: string; endDate: string } {
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const [income, setIncome] = useState(0);
-  const [expense, setExpense] = useState(0);
+  const [incomeSettled, setIncomeSettled] = useState(0);
+  const [incomeNotSettled, setIncomeNotSettled] = useState(0);
+  const [expenseSettled, setExpenseSettled] = useState(0);
+  const [expenseNotSettled, setExpenseNotSettled] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,8 +31,10 @@ export function DashboardPage() {
     transactionsService
       .getSummary(startDate, endDate)
       .then((summary) => {
-        setIncome(summary.income);
-        setExpense(summary.expense);
+        setIncomeSettled(summary.incomeSettled);
+        setIncomeNotSettled(summary.incomeNotSettled);
+        setExpenseSettled(summary.expenseSettled);
+        setExpenseNotSettled(summary.expenseNotSettled);
       })
       .catch(() => setError('Erro ao carregar resumo financeiro.'))
       .finally(() => setLoading(false));
@@ -45,9 +49,12 @@ export function DashboardPage() {
   }
 
   const cards = [
-    { label: 'Saldo total', value: formatCurrency(income - expense), color: 'text-sky-600' },
-    { label: 'Receitas do mês', value: formatCurrency(income), color: 'text-emerald-600' },
-    { label: 'Despesas do mês', value: formatCurrency(expense), color: 'text-red-500' },
+    { label: 'Despesas estimadas mês', value: formatCurrency(expenseSettled+expenseNotSettled), color: 'text-red-500' },
+    { label: 'Despesas efetivadas mês', value: formatCurrency(expenseSettled), color: 'text-red-500' },
+    { label: 'Receitas estimadas mês', value: formatCurrency(incomeSettled+incomeNotSettled), color: 'text-emerald-600' },
+    { label: 'Receitas efetivadas mês', value: formatCurrency(incomeSettled), color: 'text-emerald-600' },
+    { label: 'Saldo estimado total', value: formatCurrency((incomeSettled + incomeNotSettled) - (expenseSettled + expenseNotSettled)), color: 'text-sky-600' },
+    { label: 'Saldo efetivado total', value: formatCurrency(incomeSettled - expenseSettled), color: 'text-sky-600' },
   ];
 
   return <DashboardView userName={user?.name} cards={cards} error={error} />;
