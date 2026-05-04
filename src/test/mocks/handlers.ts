@@ -1,5 +1,16 @@
 import { http, HttpResponse } from 'msw';
-import { adminUser, authResponse, transactionSummary, usersList } from './fixtures';
+import {
+  accountsList,
+  adminUser,
+  authResponse,
+  categoriesList,
+  createdCategory,
+  createdTransaction,
+  paginatedTransactions,
+  transactionItemsList,
+  transactionSummary,
+  usersList,
+} from './fixtures';
 
 const BASE = 'http://localhost:3000';
 
@@ -41,5 +52,29 @@ export const handlers = [
 
   http.get(`${BASE}/transactions/summary`, () => {
     return HttpResponse.json(transactionSummary);
+  }),
+
+  http.get(`${BASE}/transactions/search`, () => {
+    return HttpResponse.json(paginatedTransactions);
+  }),
+
+  http.post(`${BASE}/transactions`, () => {
+    return HttpResponse.json(createdTransaction, { status: 201 });
+  }),
+
+  http.get(`${BASE}/categories`, () => {
+    return HttpResponse.json(categoriesList);
+  }),
+
+  http.post(`${BASE}/categories`, () => {
+    return HttpResponse.json(createdCategory, { status: 201 });
+  }),
+
+  http.get(`${BASE}/accounts`, () => {
+    return HttpResponse.json(accountsList);
+  }),
+
+  http.get(`${BASE}/transaction-items`, () => {
+    return HttpResponse.json(transactionItemsList);
   }),
 ];

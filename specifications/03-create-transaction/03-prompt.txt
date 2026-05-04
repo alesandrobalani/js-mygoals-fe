@@ -1,0 +1,3 @@
+No select de categoria do modal de cadastro de transação, adicionar um facilitador que permita abrir um modal simples para cadastro de uma nova categoria.
+Crie os testes automatizados para este comportamento.
+Atualize o README.

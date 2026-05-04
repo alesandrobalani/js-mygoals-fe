@@ -40,3 +40,57 @@ export interface TransactionSummary {
   income: number;
   expense: number;
 }
+
+export const TransactionType = {
+  INCOME: 'income',
+  EXPENSE: 'expense',
+} as const;
+
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
+
+export interface TransactionCategory {
+  id: string;
+  name: string;
+}
+
+export interface Transaction {
+  id: string;
+  description?: string;
+  amount: number;
+  type: TransactionType;
+  category: TransactionCategory;
+  transactionDate: string;
+  updatedAt: string;
+  dueDate: string;
+}
+
+export interface PaginatedTransactions {
+  data: Transaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
+export interface TransactionItem {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
+export interface CreateTransactionPayload {
+  description?: string;
+  amount: number;
+  type: TransactionType;
+  categoryId: string;
+  transactionItemId: string;
+  accountId: string;
+  transactionDate: string;
+  dueDate?: string;
+}
