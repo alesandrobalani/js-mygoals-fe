@@ -64,6 +64,7 @@ export interface Transaction {
   transactionDate: string;
   updatedAt: string;
   dueDate: string;
+  settled: boolean;
 }
 
 export interface PaginatedTransactions {
@@ -95,4 +96,5 @@ export interface CreateTransactionPayload {
   accountId: string;
   transactionDate: string;
   dueDate?: string;
+  settled?: boolean;
 }

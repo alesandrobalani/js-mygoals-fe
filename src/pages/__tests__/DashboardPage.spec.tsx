@@ -16,28 +16,31 @@ describe('DashboardPage', () => {
       renderWithProviders(<DashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Saldo total')).toBeInTheDocument();
-        expect(screen.getByText('Receitas do mês')).toBeInTheDocument();
-        expect(screen.getByText('Despesas do mês')).toBeInTheDocument();
+        expect(screen.getByText('Despesas estimadas mês')).toBeInTheDocument();
+        expect(screen.getByText('Despesas efetivadas mês')).toBeInTheDocument();
+        expect(screen.getByText('Receitas estimadas mês')).toBeInTheDocument();
+        expect(screen.getByText('Receitas efetivadas mês')).toBeInTheDocument();
+        expect(screen.getByText('Saldo estimado total')).toBeInTheDocument();
+        expect(screen.getByText('Saldo efetivado total')).toBeInTheDocument();
       });
     });
 
-    it('displays income value from backend', async () => {
+    it('displays settled income value from backend', async () => {
       renderWithProviders(<DashboardPage />);
 
       await waitFor(() => {
         expect(
-          screen.getByText(new RegExp(transactionSummary.income.toLocaleString('pt-BR'))),
+          screen.getByText(new RegExp(transactionSummary.incomeSettled.toLocaleString('pt-BR'))),
         ).toBeInTheDocument();
       });
     });
 
-    it('displays expense value from backend', async () => {
+    it('displays settled expense value from backend', async () => {
       renderWithProviders(<DashboardPage />);
 
       await waitFor(() => {
         expect(
-          screen.getByText(new RegExp(transactionSummary.expense.toLocaleString('pt-BR'))),
+          screen.getByText(new RegExp(transactionSummary.expenseSettled.toLocaleString('pt-BR'))),
         ).toBeInTheDocument();
       });
     });
@@ -45,7 +48,7 @@ describe('DashboardPage', () => {
     it('displays correct balance (income minus expense)', async () => {
       renderWithProviders(<DashboardPage />);
 
-      const balance = transactionSummary.income - transactionSummary.expense;
+      const balance = transactionSummary.incomeSettled - transactionSummary.expenseSettled;
       await waitFor(() => {
         expect(
           screen.getByText(new RegExp(balance.toLocaleString('pt-BR'))),
@@ -87,7 +90,7 @@ describe('DashboardPage', () => {
       renderWithProviders(<DashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Saldo total')).toBeInTheDocument();
+        expect(screen.getByText('Saldo efetivado total')).toBeInTheDocument();
         expect(screen.getAllByText(/0,00/).length).toBeGreaterThan(0);
       });
     });

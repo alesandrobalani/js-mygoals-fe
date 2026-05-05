@@ -36,8 +36,10 @@ export const authResponse: AuthResponse = {
 export const usersList: User[] = [adminUser, regularUser];
 
 export const transactionSummary: TransactionSummary = {
-  income: 5000,
-  expense: 2000,
+  incomeSettled: 5000,
+  incomeNotSettled: 1000,
+  expenseSettled: 2000,
+  expenseNotSettled: 500,
 };
 
 export const transactionsList: Transaction[] = [
@@ -50,6 +52,7 @@ export const transactionsList: Transaction[] = [
     transactionDate: '2026-04-05T00:00:00.000Z',
     dueDate: '2026-04-05T00:00:00.000Z',
     updatedAt: '2026-04-05T00:00:00.000Z',
+    settled: true,
   },
   {
     id: 'tx-2',
@@ -60,6 +63,7 @@ export const transactionsList: Transaction[] = [
     transactionDate: '2026-04-10T00:00:00.000Z',
     dueDate: '2026-04-10T00:00:00.000Z',
     updatedAt: '2026-04-10T00:00:00.000Z',
+    settled: true,
   },
   {
     id: 'tx-3',
@@ -70,6 +74,7 @@ export const transactionsList: Transaction[] = [
     transactionDate: '2026-04-15T00:00:00.000Z',
     dueDate: '2026-04-17T00:00:00.000Z',
     updatedAt: '2026-04-15T00:00:00.000Z',
+    settled: false,
   },
 ];
 
@@ -111,4 +116,5 @@ export const createdTransaction: Transaction = {
   transactionDate: '2026-04-20T00:00:00.000Z',
   dueDate: '2026-04-25T00:00:00.000Z',
   updatedAt: '2026-04-20T00:00:00.000Z',
+  settled: true,
 };
