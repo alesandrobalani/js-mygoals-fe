@@ -22,7 +22,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
   const [transactionItemId, setTransactionItemId] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
-
+  const [settled, setSettled] = useState(true);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactionItems, setTransactionItems] = useState<TransactionItem[]>([]);
@@ -75,6 +75,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         transactionItemId,
         description: description || undefined,
         dueDate: dueDate || undefined,
+        settled,
       });
       onSuccess();
       onClose();
@@ -96,6 +97,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         transactionItemId={transactionItemId}
         description={description}
         dueDate={dueDate}
+        settled={settled}
         categories={categories}
         accounts={accounts}
         transactionItems={transactionItems}
@@ -111,6 +113,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         onTransactionItemChange={setTransactionItemId}
         onDescriptionChange={setDescription}
         onDueDateChange={setDueDate}
+        onSettledChange={setSettled}
         onSubmit={handleSubmit}
         onClose={onClose}
         onOpenQuickCategory={() => setIsQuickCategoryOpen(true)}

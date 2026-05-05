@@ -31,7 +31,7 @@ export function DashboardView({ userName, cards, error, onOpenModal }: Dashboard
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {cards.map((card) => (
           <div key={card.label} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <p className="text-sm text-slate-500 mb-1">{card.label}</p>

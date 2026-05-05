@@ -24,7 +24,9 @@ interface CreateTransactionModalViewProps {
   onAccountChange: (v: string) => void;
   onTransactionItemChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
+  settled: boolean;
   onDueDateChange: (v: string) => void;
+  onSettledChange: (v: boolean) => void;
   onSubmit: () => void;
   onClose: () => void;
   onOpenQuickCategory: () => void;
@@ -44,6 +46,7 @@ export function CreateTransactionModalView({
   transactionItemId,
   description,
   dueDate,
+  settled,
   categories,
   accounts,
   transactionItems,
@@ -59,6 +62,7 @@ export function CreateTransactionModalView({
   onTransactionItemChange,
   onDescriptionChange,
   onDueDateChange,
+  onSettledChange,
   onSubmit,
   onClose,
   onOpenQuickCategory,
@@ -206,6 +210,22 @@ export function CreateTransactionModalView({
               onChange={(e) => onDueDateChange(e.target.value)}
               disabled={submitting}
             />
+          </div>
+
+          {/* Efetivado */}
+          <div className="col-span-2">
+            <label htmlFor="tx-settled" className={labelClass}>Efetivado</label>
+            <div className="flex items-center gap-2">
+              <input
+                id="tx-settled"
+                type="checkbox"
+                className="form-checkbox text-sky-600 border-slate-300 rounded focus:ring-sky-500"
+                checked={settled}
+                onChange={(e) => onSettledChange(e.target.checked)}
+                disabled={submitting}
+              />
+              <span className="text-sm text-slate-600">Marcar como efetivado</span>
+            </div>
           </div>
         </div>
 

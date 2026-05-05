@@ -13,8 +13,8 @@ describe('transactionsService', () => {
     it('returns the transaction summary for the given period', async () => {
       const result = await transactionsService.getSummary('2026-04-01', '2026-04-30');
 
-      expect(result.income).toBe(transactionSummary.income);
-      expect(result.expense).toBe(transactionSummary.expense);
+      expect(result.incomeSettled).toBe(transactionSummary.incomeSettled);
+      expect(result.expenseSettled).toBe(transactionSummary.expenseSettled);
     });
 
     it('throws when the backend returns an unexpected error', async () => {
@@ -63,6 +63,7 @@ describe('transactionsService', () => {
         accountId: 'acc-1',
         transactionItemId: 'item-1',
         description: createdTransaction.description,
+        settled: true,
       });
 
       expect(result.id).toBe(createdTransaction.id);
