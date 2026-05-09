@@ -94,8 +94,8 @@ export interface Account {
 }
 
 export interface CreateAccountPayload {
-  description?: string;
   name: string;  
+  description?: string;
 }
 
 export interface TransactionItem {
