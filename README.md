@@ -22,7 +22,7 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 
 ## Pré-requisitos
 
-- Node.js 20+
+- Node.js 22+ **ou** Docker
 - Backend `js-mygoals-be` em execução em `http://localhost:3000`
 
 ## Configuração
@@ -39,7 +39,7 @@ Edite `.env` conforme necessário:
 VITE_API_URL=http://localhost:3000
 ```
 
-## Como rodar
+## Como rodar (local)
 
 ```bash
 npm install
@@ -48,7 +48,25 @@ npm run dev
 
 Acesse: [http://localhost:5173](http://localhost:5173)
 
-## Build para produção
+## Como rodar com Docker
+
+Construa a imagem passando a URL do backend como argumento de build:
+
+```bash
+docker build --build-arg VITE_API_URL=http://localhost:3000 -t js-mygoals-fe .
+```
+
+Execute o container:
+
+```bash
+docker run -p 8080:80 js-mygoals-fe
+```
+
+Acesse: [http://localhost:8080](http://localhost:8080)
+
+> **Nota:** `VITE_API_URL` é incorporada em tempo de build pelo Vite. Sempre informe o valor correto no `--build-arg` ao gerar a imagem para produção.
+
+## Build para produção (local)
 
 ```bash
 npm run build
