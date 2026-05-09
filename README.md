@@ -53,7 +53,7 @@ Acesse: [http://localhost:5173](http://localhost:5173)
 Construa a imagem passando a URL do backend como argumento de build:
 
 ```bash
-docker build --build-arg VITE_API_URL=http://localhost:5173 -t js-mygoals-fe .
+docker build --build-arg VITE_API_URL=http://localhost:3000 -t js-mygoals-fe .
 ```
 
 Execute o container:
