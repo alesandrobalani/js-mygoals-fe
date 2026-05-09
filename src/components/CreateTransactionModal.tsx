@@ -7,6 +7,7 @@ import { accountsService } from '../services/accounts.service';
 import { transactionItemsService } from '../services/transaction-items.service';
 import { CreateTransactionModalView } from './CreateTransactionModal.view';
 import { CreateCategoryQuickModal } from './CreateCategoryQuickModal';
+import { CreateAccountQuickModal } from './CreateAccountQuickModal';
 
 interface CreateTransactionModalProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isQuickCategoryOpen, setIsQuickCategoryOpen] = useState(false);
+  const [isQuickAccountOpen, setIsQuickAccountOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -51,6 +53,12 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
     setCategories((prev) => [...prev, newCategory]);
     setCategoryId(newCategory.id);
     setIsQuickCategoryOpen(false);
+  }
+
+  function handleAccountCreated(newAccount: Account) {
+    setAccounts((prev) => [...prev, newAccount]);
+    setAccountId(newAccount.id);
+    setIsQuickAccountOpen(false);
   }
 
   const isValid =
@@ -117,11 +125,18 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         onSubmit={handleSubmit}
         onClose={onClose}
         onOpenQuickCategory={() => setIsQuickCategoryOpen(true)}
+        onOpenQuickAccount={() => setIsQuickAccountOpen(true)}
       />
       {isQuickCategoryOpen && (
         <CreateCategoryQuickModal
           onClose={() => setIsQuickCategoryOpen(false)}
           onSuccess={handleCategoryCreated}
+        />
+      )}
+      {isQuickAccountOpen && (
+        <CreateAccountQuickModal
+          onClose={() => setIsQuickAccountOpen(false)}
+          onSuccess={handleAccountCreated}
         />
       )}
     </>
