@@ -107,6 +107,12 @@ export const createdCategory: TransactionCategory = {
   name: 'Nova Cat',
 };
 
+export const createdAccount: Account = {
+  id: 'acc-new',
+  name: 'Nova Conta',
+  updatedAt: '2026-01-01T00:00:00.000Z'
+};
+
 export const createdTransaction: Transaction = {
   id: 'tx-new',
   description: 'Nova despesa',

@@ -75,18 +75,6 @@ export interface PaginatedTransactions {
   totalPages: number;
 }
 
-export interface Account {
-  id: string;
-  name: string;
-  updatedAt: string;
-}
-
-export interface TransactionItem {
-  id: string;
-  name: string;
-  updatedAt: string;
-}
-
 export interface CreateTransactionPayload {
   description?: string;
   amount: number;
@@ -98,3 +86,21 @@ export interface CreateTransactionPayload {
   dueDate?: string;
   settled?: boolean;
 }
+
+export interface Account {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
+export interface CreateAccountPayload {
+  name: string;  
+  description?: string;
+}
+
+export interface TransactionItem {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+

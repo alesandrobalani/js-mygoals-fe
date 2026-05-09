@@ -30,6 +30,7 @@ interface CreateTransactionModalViewProps {
   onSubmit: () => void;
   onClose: () => void;
   onOpenQuickCategory: () => void;
+  onOpenQuickAccount: () => void;
 }
 
 const inputClass =
@@ -66,6 +67,7 @@ export function CreateTransactionModalView({
   onSubmit,
   onClose,
   onOpenQuickCategory,
+  onOpenQuickAccount,
 }: CreateTransactionModalViewProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -154,18 +156,29 @@ export function CreateTransactionModalView({
           {/* Conta */}
           <div>
             <label htmlFor="tx-account" className={labelClass}>Conta *</label>
-            <select
-              id="tx-account"
-              className={inputClass}
-              value={accountId}
-              onChange={(e) => onAccountChange(e.target.value)}
-              disabled={loadingOptions || submitting}
-            >
-              <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
-              {accounts.map((a) => (
-                <option key={a.id} value={a.id}>{a.name}</option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                id="tx-account"
+                className={inputClass}
+                value={accountId}
+                onChange={(e) => onAccountChange(e.target.value)}
+                disabled={loadingOptions || submitting}
+              >
+                <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
+                {accounts.map((a) => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
+                <button
+                  type="button"
+                  onClick={onOpenQuickAccount}
+                  disabled={submitting}
+                  title="Nova conta"
+                  className="px-3 py-2 text-sky-600 border border-slate-300 rounded-lg hover:bg-sky-50 disabled:opacity-40 text-sm font-bold shrink-0"
+                >
+                  +
+                </button>
+              </div>
           </div>
 
           {/* Item */}
