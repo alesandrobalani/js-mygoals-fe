@@ -8,6 +8,7 @@ import { transactionItemsService } from '../services/transaction-items.service';
 import { CreateTransactionModalView } from './CreateTransactionModal.view';
 import { CreateCategoryQuickModal } from './CreateCategoryQuickModal';
 import { CreateAccountQuickModal } from './CreateAccountQuickModal';
+import { CreateTransactionItemQuickModal } from './CreateTransactionItemQuickModal';
 
 interface CreateTransactionModalProps {
   onClose: () => void;
@@ -33,7 +34,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
   const [error, setError] = useState('');
   const [isQuickCategoryOpen, setIsQuickCategoryOpen] = useState(false);
   const [isQuickAccountOpen, setIsQuickAccountOpen] = useState(false);
-
+  const [isQuickTransactionItemOpen, setIsQuickTransactionItemOpen] = useState(false);
   useEffect(() => {
     Promise.all([
       categoriesService.getAll(),
@@ -59,6 +60,12 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
     setAccounts((prev) => [...prev, newAccount]);
     setAccountId(newAccount.id);
     setIsQuickAccountOpen(false);
+  }
+
+  function handleTransactionItemCreated(newItem: TransactionItem) {
+    setTransactionItems((prev) => [...prev, newItem]);
+    setTransactionItemId(newItem.id);
+    setIsQuickTransactionItemOpen(false);
   }
 
   const isValid =
@@ -126,6 +133,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         onClose={onClose}
         onOpenQuickCategory={() => setIsQuickCategoryOpen(true)}
         onOpenQuickAccount={() => setIsQuickAccountOpen(true)}
+        onOpenQuickTransactionItem={() => setIsQuickTransactionItemOpen(true)}
       />
       {isQuickCategoryOpen && (
         <CreateCategoryQuickModal
@@ -137,6 +145,12 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
         <CreateAccountQuickModal
           onClose={() => setIsQuickAccountOpen(false)}
           onSuccess={handleAccountCreated}
+        />
+      )}
+      {isQuickTransactionItemOpen && (
+        <CreateTransactionItemQuickModal
+          onClose={() => setIsQuickTransactionItemOpen(false)}
+          onSuccess={handleTransactionItemCreated}
         />
       )}
     </>

@@ -7,6 +7,7 @@ import {
   createdAccount,
   createdCategory,
   createdTransaction,
+  createdTransactionItem,
   paginatedTransactions,
   transactionItemsList,
   transactionSummary,
@@ -81,5 +82,9 @@ export const handlers = [
 
   http.get(`${BASE}/transaction-items`, () => {
     return HttpResponse.json(transactionItemsList);
+  }),
+  
+  http.post(`${BASE}/transaction-items`, () => {
+    return HttpResponse.json(createdTransactionItem, { status: 201 });
   }),
 ];
