@@ -31,6 +31,7 @@ interface CreateTransactionModalViewProps {
   onClose: () => void;
   onOpenQuickCategory: () => void;
   onOpenQuickAccount: () => void;
+  onOpenQuickTransactionItem: () => void;
 }
 
 const inputClass =
@@ -68,6 +69,7 @@ export function CreateTransactionModalView({
   onClose,
   onOpenQuickCategory,
   onOpenQuickAccount,
+  onOpenQuickTransactionItem,
 }: CreateTransactionModalViewProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -169,33 +171,45 @@ export function CreateTransactionModalView({
                   <option key={a.id} value={a.id}>{a.name}</option>
                 ))}
               </select>
-                <button
-                  type="button"
-                  onClick={onOpenQuickAccount}
-                  disabled={submitting}
-                  title="Nova conta"
-                  className="px-3 py-2 text-sky-600 border border-slate-300 rounded-lg hover:bg-sky-50 disabled:opacity-40 text-sm font-bold shrink-0"
-                >
-                  +
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={onOpenQuickAccount}
+                disabled={submitting}
+                title="Nova conta"
+                className="px-3 py-2 text-sky-600 border border-slate-300 rounded-lg hover:bg-sky-50 disabled:opacity-40 text-sm font-bold shrink-0"
+              >
+                +
+              </button>
+            </div>
           </div>
 
           {/* Item */}
           <div>
             <label htmlFor="tx-item" className={labelClass}>Item *</label>
-            <select
-              id="tx-item"
-              className={inputClass}
-              value={transactionItemId}
-              onChange={(e) => onTransactionItemChange(e.target.value)}
-              disabled={loadingOptions || submitting}
-            >
-              <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
-              {transactionItems.map((i) => (
-                <option key={i.id} value={i.id}>{i.name}</option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+
+              <select
+                id="tx-item"
+                className={inputClass}
+                value={transactionItemId}
+                onChange={(e) => onTransactionItemChange(e.target.value)}
+                disabled={loadingOptions || submitting}
+              >
+                <option value="">{loadingOptions ? 'Carregando...' : 'Selecione'}</option>
+                {transactionItems.map((i) => (
+                  <option key={i.id} value={i.id}>{i.name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={onOpenQuickTransactionItem}
+                disabled={submitting}
+                title="Novo item"
+                className="px-3 py-2 text-sky-600 border border-slate-300 rounded-lg hover:bg-sky-50 disabled:opacity-40 text-sm font-bold shrink-0"
+              >
+                +
+              </button>
+            </div>
           </div>
 
           {/* Descrição */}

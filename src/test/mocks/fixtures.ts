@@ -113,6 +113,12 @@ export const createdAccount: Account = {
   updatedAt: '2026-01-01T00:00:00.000Z'
 };
 
+export const createdTransactionItem: TransactionItem = {
+  id: 'item-new',
+  name: 'Novo Item',
+  updatedAt: '2026-01-01T00:00:00.000Z'
+};
+
 export const createdTransaction: Transaction = {
   id: 'tx-new',
   description: 'Nova despesa',
