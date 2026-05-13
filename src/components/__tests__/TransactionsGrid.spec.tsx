@@ -79,7 +79,7 @@ describe('TransactionsGrid', () => {
       renderWithProviders(<TransactionsGrid />);
 
       await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
-
+      
       await userEvent.click(screen.getByRole('button', { name: '50' }));
 
       await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());

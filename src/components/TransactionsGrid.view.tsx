@@ -19,10 +19,6 @@ function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR');
-}
-
 export function TransactionsGridView({
   transactions,
   page,
@@ -67,7 +63,7 @@ export function TransactionsGridView({
             <tbody>
               {transactions.map((tx, i) => (
                 <tr key={tx.id} className={i < transactions.length - 1 ? 'border-b border-slate-100' : ''}>
-                  <td className="px-6 py-4 text-slate-500">{formatDate(tx.transactionDate)}</td>
+                  <td className="px-6 py-4 text-slate-500">{tx.transactionDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-800">{tx.description ?? '—'}</td>
                   <td className="px-6 py-4">
                     <span
@@ -87,7 +83,7 @@ export function TransactionsGridView({
                   >
                     {formatCurrency(tx.amount)}
                   </td>
-                  <td className="px-6 py-4 text-slate-500">{formatDate(tx.dueDate)}</td>
+                  <td className="px-6 py-4 text-slate-500">{tx.dueDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-500">{tx.settled ? 'Sim' : 'Não'}</td>
                 </tr>
               ))}
