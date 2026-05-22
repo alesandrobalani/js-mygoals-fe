@@ -62,19 +62,33 @@ export function TransactionsGridView({
             </thead>
             <tbody>
               {transactions.map((tx, i) => (
-                <tr key={tx.id} className={i < transactions.length - 1 ? 'border-b border-slate-100' : ''}>
+                <tr
+                  key={tx.id}
+                  className={[
+                    i < transactions.length - 1 ? 'border-b border-slate-100' : '',
+                    tx.type === TransactionType.INCOME ? 'bg-emerald-50/60' : 'bg-red-50/40',
+                  ].join(' ')}
+                >
                   <td className="px-6 py-4 text-slate-500">{tx.transactionDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-800">{tx.description ?? '—'}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        tx.type === TransactionType.INCOME
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-red-100 text-red-600'
-                      }`}
-                    >
-                      {tx.type === TransactionType.INCOME ? 'Receita' : 'Despesa'}
-                    </span>
+                    {tx.type === TransactionType.INCOME ? (
+                      <span aria-label="Receita" title="Receita">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="16 12 12 8 8 12" />
+                          <line x1="12" y1="16" x2="12" y2="8" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span aria-label="Despesa" title="Despesa">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="8 12 12 16 16 12" />
+                          <line x1="12" y1="8" x2="12" y2="16" />
+                        </svg>
+                      </span>
+                    )}
                   </td>
                   <td
                     className={`px-6 py-4 text-right font-medium ${
@@ -84,7 +98,23 @@ export function TransactionsGridView({
                     {formatCurrency(tx.amount)}
                   </td>
                   <td className="px-6 py-4 text-slate-500">{tx.dueDate ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-500">{tx.settled ? 'Sim' : 'Não'}</td>
+                  <td className="px-6 py-4">
+                    {tx.settled ? (
+                      <span aria-label="Efetivado" title="Efetivado">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                          <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span aria-label="Pendente" title="Pendente">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
