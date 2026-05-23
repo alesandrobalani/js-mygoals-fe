@@ -1,0 +1,3 @@
+No GRID de transações do mês, quero alterar algumas informações textuais por icones.
+As colunas a serem alteradas são Tipo e Efetivado.
+Cada linha quero que tenha uma cor que represente o tipo da transação daquela linha.

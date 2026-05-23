@@ -35,19 +35,19 @@ describe('TransactionsGrid', () => {
       });
     });
 
-    it('shows income badge for income transactions', async () => {
+    it('shows income icon for income transactions', async () => {
       renderWithProviders(<TransactionsGrid />);
 
       await waitFor(() => {
-        expect(screen.getByText('Receita')).toBeInTheDocument();
+        expect(screen.getByLabelText('Receita')).toBeInTheDocument();
       });
     });
 
-    it('shows expense badge for expense transactions', async () => {
+    it('shows expense icon for expense transactions', async () => {
       renderWithProviders(<TransactionsGrid />);
 
       await waitFor(() => {
-        expect(screen.getAllByText('Despesa').length).toBeGreaterThan(0);
+        expect(screen.getAllByLabelText('Despesa').length).toBeGreaterThan(0);
       });
     });
 
