@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -8,13 +8,16 @@ import { server } from '../../test/mocks/server';
 import { paginatedTransactions, transactionsList } from '../../test/mocks/fixtures';
 
 describe('TransactionsGrid', () => {
+  const onEditTransaction = vi.fn();
+
   beforeEach(() => {
     localStorage.setItem('accessToken', 'mock-access-token');
+    onEditTransaction.mockClear();
   });
 
   describe('happy flow', () => {
     it('renders the table column headers', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => {
         expect(screen.getByText('Data')).toBeInTheDocument();
@@ -26,7 +29,7 @@ describe('TransactionsGrid', () => {
     });
 
     it('displays transactions from backend', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => {
         expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument();
@@ -36,7 +39,7 @@ describe('TransactionsGrid', () => {
     });
 
     it('shows income icon for income transactions', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => {
         expect(screen.getByLabelText('Receita')).toBeInTheDocument();
@@ -44,15 +47,38 @@ describe('TransactionsGrid', () => {
     });
 
     it('shows expense icon for expense transactions', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => {
         expect(screen.getAllByLabelText('Despesa').length).toBeGreaterThan(0);
       });
     });
 
+    it('renders an edit button for each transaction row', async () => {
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => {
+        const editButtons = screen.getAllByRole('button', { name: 'Editar transação' });
+        expect(editButtons).toHaveLength(transactionsList.length);
+      });
+    });
+
+    it('calls onEditTransaction with the correct transaction when edit is clicked', async () => {
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() =>
+        expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument(),
+      );
+
+      const editButtons = screen.getAllByRole('button', { name: 'Editar transação' });
+      await userEvent.click(editButtons[0]);
+
+      expect(onEditTransaction).toHaveBeenCalledOnce();
+      expect(onEditTransaction).toHaveBeenCalledWith(transactionsList[0]);
+    });
+
     it('displays pagination info', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => {
         expect(
@@ -68,7 +94,7 @@ describe('TransactionsGrid', () => {
         ),
       );
 
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() =>
         expect(screen.getByText('Nenhuma transação no período.')).toBeInTheDocument(),
@@ -76,10 +102,10 @@ describe('TransactionsGrid', () => {
     });
 
     it('changes page size when limit button is clicked', async () => {
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
-      
+
       await userEvent.click(screen.getByRole('button', { name: '50' }));
 
       await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
@@ -94,7 +120,7 @@ describe('TransactionsGrid', () => {
         ),
       );
 
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() =>
         expect(screen.getByText('Erro ao carregar transações.')).toBeInTheDocument(),
@@ -108,7 +134,7 @@ describe('TransactionsGrid', () => {
         ),
       );
 
-      renderWithProviders(<TransactionsGrid />);
+      renderWithProviders(<TransactionsGrid onEditTransaction={onEditTransaction} />);
 
       await waitFor(() =>
         expect(screen.getByText('Erro ao carregar transações.')).toBeInTheDocument(),

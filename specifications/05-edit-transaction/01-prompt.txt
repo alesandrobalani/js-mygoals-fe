@@ -1,0 +1,4 @@
+No Grid de transações quero que seja adicionado um icone de edição de transações.
+Ao clicar neste ícone, o modal da transação deve ser aberto carregando os dados da transação que foi selcionada para ser editada.
+Ao concluir a operação de alteração de dados no modal, caso confirmado a operação, a operação de alteração deve ser enviada para o backend, e o resultado da operação do backend deve ser atualizado na tela principal do dashboard.
+Os dados do dashboard devem ser atualizados com as alterações efetivadas, ou apresentando o erro informado pelo backend.

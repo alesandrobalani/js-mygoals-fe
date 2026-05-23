@@ -11,6 +11,7 @@ import {
   paginatedTransactions,
   transactionItemsList,
   transactionSummary,
+  updatedTransaction,
   usersList,
 } from './fixtures';
 
@@ -62,6 +63,10 @@ export const handlers = [
 
   http.post(`${BASE}/transactions`, () => {
     return HttpResponse.json(createdTransaction, { status: 201 });
+  }),
+
+  http.put(`${BASE}/transactions/:id`, () => {
+    return HttpResponse.json(updatedTransaction);
   }),
 
   http.get(`${BASE}/categories`, () => {

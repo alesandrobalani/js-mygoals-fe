@@ -5,7 +5,7 @@ import { http, HttpResponse } from 'msw';
 import { CreateTransactionModal } from '../CreateTransactionModal';
 import { renderWithProviders } from '../../test/render-helpers';
 import { server } from '../../test/mocks/server';
-import { categoriesList, accountsList, transactionItemsList, createdTransaction } from '../../test/mocks/fixtures';
+import { categoriesList, accountsList, transactionItemsList, createdTransaction, transactionWithDetails, updatedTransaction } from '../../test/mocks/fixtures';
 
 describe('CreateTransactionModal', () => {
   const onClose = vi.fn();
@@ -159,6 +159,137 @@ describe('CreateTransactionModal', () => {
       renderWithProviders(<CreateTransactionModal onClose={onClose} onSuccess={onSuccess} />);
 
       expect(screen.getByRole('button', { name: /Salvar/ })).toBeDisabled();
+    });
+  });
+
+  describe('edit mode', () => {
+    it('shows title "Editar Transação" when transaction prop is provided', async () => {
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Editar Transação')).toBeInTheDocument(),
+      );
+    });
+
+    it('shows "Salvar alterações" button in edit mode', async () => {
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: /Salvar alterações/ })).toBeInTheDocument(),
+      );
+    });
+
+    it('pre-fills amount field from transaction', async () => {
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByDisplayValue(String(transactionWithDetails.amount))).toBeInTheDocument(),
+      );
+    });
+
+    it('pre-fills description field from transaction', async () => {
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByDisplayValue(transactionWithDetails.description!)).toBeInTheDocument(),
+      );
+    });
+
+    it('pre-fills settled checkbox from transaction', async () => {
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() => {
+        const checkbox = screen.getByLabelText(/Efetivado/);
+        expect(checkbox).toBeChecked();
+      });
+    });
+
+    it('calls PUT /transactions/:id on submit in edit mode', async () => {
+      let capturedId: string | undefined;
+      let capturedBody: unknown;
+
+      server.use(
+        http.put('http://localhost:3000/transactions/:id', async ({ request, params }) => {
+          capturedId = params.id as string;
+          capturedBody = await request.json();
+          return HttpResponse.json(updatedTransaction);
+        }),
+      );
+
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: categoriesList[0].name })).toBeInTheDocument(),
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: /Salvar alterações/ }));
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+      expect(capturedId).toBe(transactionWithDetails.id);
+      expect((capturedBody as Record<string, unknown>).amount).toBe(transactionWithDetails.amount);
+      expect(onClose).toHaveBeenCalledOnce();
+    });
+
+    it('does not call POST /transactions in edit mode', async () => {
+      let postCalled = false;
+      server.use(
+        http.post('http://localhost:3000/transactions', () => {
+          postCalled = true;
+          return HttpResponse.json(createdTransaction, { status: 201 });
+        }),
+      );
+
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: categoriesList[0].name })).toBeInTheDocument(),
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: /Salvar alterações/ }));
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+      expect(postCalled).toBe(false);
+    });
+
+    it('shows error when PUT /transactions/:id returns 500', async () => {
+      server.use(
+        http.put('http://localhost:3000/transactions/:id', () =>
+          HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+        ),
+      );
+
+      renderWithProviders(
+        <CreateTransactionModal onClose={onClose} onSuccess={onSuccess} transaction={transactionWithDetails} />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: categoriesList[0].name })).toBeInTheDocument(),
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: /Salvar alterações/ }));
+
+      await waitFor(() =>
+        expect(
+          screen.getByText('Erro ao editar transação. Tente novamente.'),
+        ).toBeInTheDocument(),
+      );
+
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onClose).not.toHaveBeenCalled();
     });
   });
 

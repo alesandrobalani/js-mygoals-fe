@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Account, TransactionCategory, TransactionItem } from '../types';
+import type { Account, Transaction, TransactionCategory, TransactionItem } from '../types';
 import { TransactionType } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { categoriesService } from '../services/categories.service';
@@ -13,18 +13,25 @@ import { CreateTransactionItemQuickModal } from './CreateTransactionItemQuickMod
 interface CreateTransactionModalProps {
   onClose: () => void;
   onSuccess: () => void;
+  transaction?: Transaction;
 }
 
-export function CreateTransactionModal({ onClose, onSuccess }: CreateTransactionModalProps) {
-  const [type, setType] = useState<string>(TransactionType.EXPENSE);
-  const [amount, setAmount] = useState('');
-  const [transactionDate, setTransactionDate] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [accountId, setAccountId] = useState('');
-  const [transactionItemId, setTransactionItemId] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [settled, setSettled] = useState(true);
+export function CreateTransactionModal({ onClose, onSuccess, transaction }: CreateTransactionModalProps) {
+  const isEditMode = !!transaction;
+
+  const [type, setType] = useState<string>(transaction?.type ?? TransactionType.EXPENSE);
+  const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '');
+  const [transactionDate, setTransactionDate] = useState(
+    transaction ? transaction.transactionDate.split('T')[0] : '',
+  );
+  const [categoryId, setCategoryId] = useState(transaction?.category.id ?? '');
+  const [accountId, setAccountId] = useState(transaction?.account?.id ?? '');
+  const [transactionItemId, setTransactionItemId] = useState(transaction?.transactionItem?.id ?? '');
+  const [description, setDescription] = useState(transaction?.description ?? '');
+  const [dueDate, setDueDate] = useState(
+    transaction?.dueDate ? transaction.dueDate.split('T')[0] : '',
+  );
+  const [settled, setSettled] = useState(transaction?.settled ?? true);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactionItems, setTransactionItems] = useState<TransactionItem[]>([]);
@@ -80,22 +87,27 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
     if (!isValid) return;
     setSubmitting(true);
     setError('');
+    const payload = {
+      type: type as typeof TransactionType[keyof typeof TransactionType],
+      amount: Number(amount),
+      transactionDate,
+      categoryId,
+      accountId,
+      transactionItemId,
+      description: description || undefined,
+      dueDate: dueDate || undefined,
+      settled,
+    };
     try {
-      await transactionsService.create({
-        type: type as typeof TransactionType[keyof typeof TransactionType],
-        amount: Number(amount),
-        transactionDate,
-        categoryId,
-        accountId,
-        transactionItemId,
-        description: description || undefined,
-        dueDate: dueDate || undefined,
-        settled,
-      });
+      if (isEditMode && transaction) {
+        await transactionsService.update(transaction.id, payload);
+      } else {
+        await transactionsService.create(payload);
+      }
       onSuccess();
       onClose();
     } catch {
-      setError('Erro ao criar transação. Tente novamente.');
+      setError(isEditMode ? 'Erro ao editar transação. Tente novamente.' : 'Erro ao criar transação. Tente novamente.');
     } finally {
       setSubmitting(false);
     }
@@ -104,6 +116,7 @@ export function CreateTransactionModal({ onClose, onSuccess }: CreateTransaction
   return (
     <>
       <CreateTransactionModalView
+        isEditMode={isEditMode}
         type={type}
         amount={amount}
         transactionDate={transactionDate}

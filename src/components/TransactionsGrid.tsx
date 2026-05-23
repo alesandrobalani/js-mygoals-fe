@@ -3,6 +3,7 @@ import type { Transaction } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { TransactionsGridView } from './TransactionsGrid.view';
 
+
 function getCurrentMonthRange(): { startDate: string; endDate: string } {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -13,7 +14,13 @@ function getCurrentMonthRange(): { startDate: string; endDate: string } {
   };
 }
 
-export function TransactionsGrid({ refreshKey = 0 }: { refreshKey?: number }) {
+export function TransactionsGrid({
+  refreshKey = 0,
+  onEditTransaction,
+}: {
+  refreshKey?: number;
+  onEditTransaction: (tx: Transaction) => void;
+}) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -53,6 +60,7 @@ export function TransactionsGrid({ refreshKey = 0 }: { refreshKey?: number }) {
       error={error}
       onPageChange={setPage}
       onLimitChange={handleLimitChange}
+      onEditTransaction={onEditTransaction}
     />
   );
 }
