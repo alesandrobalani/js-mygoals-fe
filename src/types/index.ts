@@ -61,6 +61,8 @@ export interface Transaction {
   amount: number;
   type: TransactionType;
   category: TransactionCategory;
+  account?: { id: string; name: string };
+  transactionItem?: { id: string; name: string };
   transactionDate: string;
   updatedAt: string;
   dueDate: string;
@@ -86,6 +88,8 @@ export interface CreateTransactionPayload {
   dueDate?: string;
   settled?: boolean;
 }
+
+export type UpdateTransactionPayload = CreateTransactionPayload;
 
 export interface Account {
   id: string;

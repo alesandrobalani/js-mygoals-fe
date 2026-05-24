@@ -2,6 +2,7 @@ import type { Account, TransactionCategory, TransactionItem } from '../types';
 import { TransactionType } from '../types';
 
 interface CreateTransactionModalViewProps {
+  isEditMode?: boolean;
   type: string;
   amount: string;
   transactionDate: string;
@@ -40,6 +41,7 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
 
 export function CreateTransactionModalView({
+  isEditMode = false,
   type,
   amount,
   transactionDate,
@@ -74,7 +76,9 @@ export function CreateTransactionModalView({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-5">Nova Transação</h2>
+        <h2 className="text-lg font-semibold text-slate-800 mb-5">
+          {isEditMode ? 'Editar Transação' : 'Nova Transação'}
+        </h2>
 
         {error && (
           <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -274,7 +278,7 @@ export function CreateTransactionModalView({
             {submitting && (
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             )}
-            Salvar
+            {isEditMode ? 'Salvar alterações' : 'Salvar'}
           </button>
         </div>
       </div>

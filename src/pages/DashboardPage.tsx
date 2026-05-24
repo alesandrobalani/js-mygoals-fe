@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import type { Transaction } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
 import { TransactionsGrid } from '../components/TransactionsGrid';
@@ -28,6 +29,7 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -47,6 +49,14 @@ export function DashboardPage() {
   function handleTransactionCreated() {
     setRefreshKey((k) => k + 1);
     setLoading(true);
+  }
+
+  function handleEditTransaction(tx: Transaction) {
+    setEditingTransaction(tx);
+  }
+
+  function handleEditModalClose() {
+    setEditingTransaction(null);
   }
 
   if (loading) {
@@ -74,11 +84,18 @@ export function DashboardPage() {
         error={error}
         onOpenModal={() => setIsModalOpen(true)}
       />
-      <TransactionsGrid refreshKey={refreshKey} />
+      <TransactionsGrid refreshKey={refreshKey} onEditTransaction={handleEditTransaction} />
       {isModalOpen && (
         <CreateTransactionModal
           onClose={() => setIsModalOpen(false)}
           onSuccess={handleTransactionCreated}
+        />
+      )}
+      {editingTransaction && (
+        <CreateTransactionModal
+          transaction={editingTransaction}
+          onClose={handleEditModalClose}
+          onSuccess={() => { handleTransactionCreated(); handleEditModalClose(); }}
         />
       )}
     </>

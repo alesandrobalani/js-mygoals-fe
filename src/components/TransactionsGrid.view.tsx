@@ -1,6 +1,7 @@
 import type { Transaction } from '../types';
 import { TransactionType } from '../types';
 
+
 const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
 
 interface TransactionsGridViewProps {
@@ -13,6 +14,7 @@ interface TransactionsGridViewProps {
   error: string;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
+  onEditTransaction: (tx: Transaction) => void;
 }
 
 function formatCurrency(value: number): string {
@@ -28,6 +30,7 @@ export function TransactionsGridView({
   error,
   onPageChange,
   onLimitChange,
+  onEditTransaction,
 }: TransactionsGridViewProps) {
   return (
     <div className="mt-8">
@@ -58,6 +61,7 @@ export function TransactionsGridView({
                 <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Efetivado</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -114,6 +118,19 @@ export function TransactionsGridView({
                         </svg>
                       </span>
                     )}
+                  </td>
+                  <td className="px-4 py-4">
+                    <button
+                      onClick={() => onEditTransaction(tx)}
+                      aria-label="Editar transação"
+                      title="Editar"
+                      className="p-1 rounded text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               ))}

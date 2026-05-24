@@ -130,3 +130,24 @@ export const createdTransaction: Transaction = {
   updatedAt: '2026-04-20T00:00:00.000Z',
   settled: true,
 };
+
+export const transactionWithDetails: Transaction = {
+  id: 'tx-1',
+  description: 'Salário',
+  amount: 5000,
+  type: TransactionType.INCOME,
+  category: { id: 'cat-1', name: 'Renda' },
+  account: { id: 'acc-1', name: 'Conta Corrente' },
+  transactionItem: { id: 'item-1', name: 'Salário mensal' },
+  transactionDate: '2026-04-05T00:00:00.000Z',
+  dueDate: '2026-04-05T00:00:00.000Z',
+  updatedAt: '2026-04-05T00:00:00.000Z',
+  settled: true,
+};
+
+export const updatedTransaction: Transaction = {
+  ...transactionWithDetails,
+  amount: 5500,
+  description: 'Salário atualizado',
+  updatedAt: '2026-05-01T00:00:00.000Z',
+};

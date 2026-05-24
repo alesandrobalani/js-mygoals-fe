@@ -1,5 +1,5 @@
 import api from './api';
-import type { CreateTransactionPayload, PaginatedTransactions, Transaction, TransactionSummary } from '../types';
+import type { CreateTransactionPayload, PaginatedTransactions, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
 
 export const transactionsService = {
   async getSummary(startDate: string, endDate: string): Promise<TransactionSummary> {
@@ -23,6 +23,11 @@ export const transactionsService = {
 
   async create(payload: CreateTransactionPayload): Promise<Transaction> {
     const { data } = await api.post<Transaction>('/transactions', payload);
+    return data;
+  },
+
+  async update(id: string, payload: UpdateTransactionPayload): Promise<Transaction> {
+    const { data } = await api.put<Transaction>(`/transactions/${id}`, payload);
     return data;
   },
 };
