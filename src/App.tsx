@@ -6,6 +6,7 @@ import { UserRoute } from './components/UserRoute';
 import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { AccountsDashboardPage } from './pages/AccountsDashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { CreateUserPage } from './pages/CreateUserPage';
 
@@ -30,6 +31,7 @@ function App() {
               {/* Somente não-admin */}
               <Route element={<UserRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/contas" element={<AccountsDashboardPage />} />
               </Route>
 
             </Route>

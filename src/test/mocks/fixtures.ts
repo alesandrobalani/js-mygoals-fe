@@ -8,6 +8,7 @@ import {
   type PaginatedTransactions,
   type TransactionCategory,
   type Account,
+  type AccountSummary,
   type TransactionItem,
 } from '../../types';
 
@@ -151,3 +152,20 @@ export const updatedTransaction: Transaction = {
   description: 'Salário atualizado',
   updatedAt: '2026-05-01T00:00:00.000Z',
 };
+
+export const accountSummaryList: AccountSummary[] = [
+  {
+    account: { id: 'acc-1', name: 'Conta Corrente' },
+    incomeSettled: 5000,
+    incomeNotSettled: 1000,
+    expenseSettled: 2000,
+    expenseNotSettled: 500,
+  },
+  {
+    account: { id: 'acc-2', name: 'Poupança' },
+    incomeSettled: 3000,
+    incomeNotSettled: 0,
+    expenseSettled: 1000,
+    expenseNotSettled: 200,
+  },
+];
