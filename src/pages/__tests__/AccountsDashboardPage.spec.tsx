@@ -16,8 +16,8 @@ describe('AccountsDashboardPage', () => {
       renderWithProviders(<AccountsDashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Conta Corrente/)).toBeInTheDocument();
-        expect(screen.getByText(/Poupança/)).toBeInTheDocument();
+        expect(screen.getAllByText(/Conta Corrente/).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Poupança/).length).toBeGreaterThan(0);
       });
     });
 
@@ -44,10 +44,11 @@ describe('AccountsDashboardPage', () => {
 
       const s = accountSummaryList[0];
       const settled = s.incomeSettled - s.expenseSettled; // 3000
-      const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(settled);
 
       await waitFor(() => {
-        expect(screen.getByText(formatted)).toBeInTheDocument();
+        const label = screen.getByText(`Saldo efetivado — ${s.account.name}`);
+        expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
+          .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(settled).replace(/\s/g, ' ').trim());
       });
     });
 
@@ -56,10 +57,11 @@ describe('AccountsDashboardPage', () => {
 
       const s = accountSummaryList[1];
       const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled); // 1800
-      const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimated);
 
       await waitFor(() => {
-        expect(screen.getByText(formatted)).toBeInTheDocument();
+        const label = screen.getByText(`Saldo estimado — ${s.account.name}`);
+        expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
+          .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimated).replace(/\s/g, ' ').trim());
       });
     });
 
