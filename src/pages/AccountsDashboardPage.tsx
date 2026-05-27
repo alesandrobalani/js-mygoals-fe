@@ -41,19 +41,20 @@ export function AccountsDashboardPage() {
     );
   }
 
-  const cards = summaries.flatMap((s) => {
+  const accounts = summaries.map((s) => {
     const settled = s.incomeSettled - s.expenseSettled;
     const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled);
-    return [
-      { label: `Saldo efetivado — ${s.accountName}`, value: formatCurrency(settled), color: balanceColor(settled) },
-      { label: `Saldo estimado — ${s.accountName}`, value: formatCurrency(estimated), color: balanceColor(estimated) },
-    ];
+    return {
+      accountName: s.accountName,
+      settled: { value: formatCurrency(settled), color: balanceColor(settled) },
+      estimated: { value: formatCurrency(estimated), color: balanceColor(estimated) },
+    };
   });
 
   return (
     <AccountsDashboardView
       userName={user?.name}
-      cards={cards}
+      accounts={accounts}
       error={error}
     />
   );

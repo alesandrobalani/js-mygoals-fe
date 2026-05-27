@@ -1,16 +1,21 @@
-interface StatCard {
-  label: string;
+interface SubCard {
   value: string;
   color: string;
 }
 
+interface AccountCard {
+  accountName: string;
+  settled: SubCard;
+  estimated: SubCard;
+}
+
 interface AccountsDashboardViewProps {
   userName: string | undefined;
-  cards: StatCard[];
+  accounts: AccountCard[];
   error: string;
 }
 
-export function AccountsDashboardView({ userName, cards, error }: AccountsDashboardViewProps) {
+export function AccountsDashboardView({ userName, accounts, error }: AccountsDashboardViewProps) {
   return (
     <div>
       <div className="mb-2">
@@ -24,15 +29,24 @@ export function AccountsDashboardView({ userName, cards, error }: AccountsDashbo
         </div>
       )}
 
-      {cards.length === 0 && !error && (
+      {accounts.length === 0 && !error && (
         <p className="text-slate-400 text-sm">Nenhuma conta cadastrada.</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {cards.map((card) => (
-          <div key={card.label} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <p className="text-sm text-slate-500 mb-1">{card.label}</p>
-            <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
+      <div className="flex flex-col gap-4">
+        {accounts.map((account) => (
+          <div key={account.accountName} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-base font-semibold text-slate-700 mb-4">{account.accountName}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-sky-50 border border-sky-100 rounded-xl p-4">
+                <p className="text-xs font-medium text-sky-600 uppercase tracking-wide mb-1">Efetivado</p>
+                <p className={`text-xl font-bold ${account.settled.color}`}>{account.settled.value}</p>
+              </div>
+              <div className="bg-violet-50 border border-violet-100 rounded-xl p-4">
+                <p className="text-xs font-medium text-violet-600 uppercase tracking-wide mb-1">Estimado</p>
+                <p className={`text-xl font-bold ${account.estimated.color}`}>{account.estimated.value}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
