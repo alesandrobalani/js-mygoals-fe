@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { transactionsService } from '../transactions.service';
-import { createdTransaction, paginatedTransactions, transactionSummary } from '../../test/mocks/fixtures';
+import { accountSummaryList, createdTransaction, paginatedTransactions, transactionSummary } from '../../test/mocks/fixtures';
 import { server } from '../../test/mocks/server';
 
 describe('transactionsService', () => {
@@ -89,4 +89,31 @@ describe('transactionsService', () => {
       ).rejects.toThrow();
     });
   });
+
+  describe('getAccountSummary', () => {
+    it('returns the transaction account summary until the given date', async () => {
+      const result = await transactionsService.getAccountSummary('2026-04-30');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].accountName).toBe('Conta Corrente');
+      expect(result[0].incomeSettled).toBe(accountSummaryList[0].incomeSettled);
+      expect(result[0].expenseSettled).toBe(accountSummaryList[0].expenseSettled);
+      expect(result[1].accountName).toBe('Poupança');
+      expect(result[1].incomeSettled).toBe(accountSummaryList[1].incomeSettled);
+      expect(result[1].expenseSettled).toBe(accountSummaryList[1].expenseSettled);
+    });
+
+    it('throws when the backend returns an unexpected error', async () => {
+      server.use(
+        http.get('http://localhost:3000/transactions/summaryByAccount', () =>
+          HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+        ),
+      );
+
+      await expect(
+        transactionsService.getAccountSummary('2026-04-30'),
+      ).rejects.toThrow();
+    });
+  });
+
 });

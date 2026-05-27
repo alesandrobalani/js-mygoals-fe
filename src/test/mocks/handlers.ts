@@ -82,10 +82,6 @@ export const handlers = [
     return HttpResponse.json(accountsList);
   }),
 
-  http.get(`${BASE}/accounts/summary`, () => {
-    return HttpResponse.json(accountSummaryList);
-  }),
-
   http.post(`${BASE}/accounts`, () => {
     return HttpResponse.json(createdAccount, { status: 201 });
   }),
@@ -96,5 +92,9 @@ export const handlers = [
   
   http.post(`${BASE}/transaction-items`, () => {
     return HttpResponse.json(createdTransactionItem, { status: 201 });
+  }),
+
+  http.get(`${BASE}/transactions/summaryByAccount`, () => {
+    return HttpResponse.json(accountSummaryList);
   }),
 ];

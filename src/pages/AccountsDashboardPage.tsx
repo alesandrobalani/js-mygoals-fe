@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import type { AccountSummary } from '../types';
-import { accountsService } from '../services/accounts.service';
 import { AccountsDashboardView } from './AccountsDashboardPage.view';
+import { transactionsService } from '../services/transactions.service';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -26,8 +26,8 @@ export function AccountsDashboardPage() {
 
   useEffect(() => {
     const endDate = getCurrentMonthEndDate();
-    accountsService
-      .getSummary(endDate)
+    transactionsService
+      .getAccountSummary(endDate)
       .then((data) => setSummaries(data))
       .catch(() => setError('Erro ao carregar resumo de contas.'))
       .finally(() => setLoading(false));
@@ -45,8 +45,8 @@ export function AccountsDashboardPage() {
     const settled = s.incomeSettled - s.expenseSettled;
     const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled);
     return [
-      { label: `Saldo efetivado — ${s.account.name}`, value: formatCurrency(settled), color: balanceColor(settled) },
-      { label: `Saldo estimado — ${s.account.name}`, value: formatCurrency(estimated), color: balanceColor(estimated) },
+      { label: `Saldo efetivado — ${s.accountName}`, value: formatCurrency(settled), color: balanceColor(settled) },
+      { label: `Saldo estimado — ${s.accountName}`, value: formatCurrency(estimated), color: balanceColor(estimated) },
     ];
   });
 

@@ -25,8 +25,8 @@ describe('AccountsDashboardPage', () => {
       renderWithProviders(<AccountsDashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[0].account.name}`)).toBeInTheDocument();
-        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[1].account.name}`)).toBeInTheDocument();
+        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[0].accountName}`)).toBeInTheDocument();
+        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[1].accountName}`)).toBeInTheDocument();
       });
     });
 
@@ -34,8 +34,8 @@ describe('AccountsDashboardPage', () => {
       renderWithProviders(<AccountsDashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[0].account.name}`)).toBeInTheDocument();
-        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[1].account.name}`)).toBeInTheDocument();
+        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[0].accountName}`)).toBeInTheDocument();
+        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[1].accountName}`)).toBeInTheDocument();
       });
     });
 
@@ -46,7 +46,7 @@ describe('AccountsDashboardPage', () => {
       const settled = s.incomeSettled - s.expenseSettled; // 3000
 
       await waitFor(() => {
-        const label = screen.getByText(`Saldo efetivado — ${s.account.name}`);
+        const label = screen.getByText(`Saldo efetivado — ${s.accountName}`);
         expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
           .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(settled).replace(/\s/g, ' ').trim());
       });
@@ -59,7 +59,7 @@ describe('AccountsDashboardPage', () => {
       const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled); // 1800
 
       await waitFor(() => {
-        const label = screen.getByText(`Saldo estimado — ${s.account.name}`);
+        const label = screen.getByText(`Saldo estimado — ${s.accountName}`);
         expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
           .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimated).replace(/\s/g, ' ').trim());
       });
@@ -73,7 +73,7 @@ describe('AccountsDashboardPage', () => {
 
     it('shows empty state message when no accounts are returned', async () => {
       server.use(
-        http.get('http://localhost:3000/accounts/summary', () =>
+        http.get('http://localhost:3000/transactions/summaryByAccount', () =>
           HttpResponse.json([]),
         ),
       );
@@ -89,7 +89,7 @@ describe('AccountsDashboardPage', () => {
   describe('bad flow', () => {
     it('shows error message when backend returns 500', async () => {
       server.use(
-        http.get('http://localhost:3000/accounts/summary', () =>
+        http.get('http://localhost:3000/transactions/summaryByAccount', () =>
           HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
         ),
       );
@@ -103,7 +103,7 @@ describe('AccountsDashboardPage', () => {
 
     it('does not crash when backend returns 503', async () => {
       server.use(
-        http.get('http://localhost:3000/accounts/summary', () =>
+        http.get('http://localhost:3000/transactions/summaryByAccount', () =>
           HttpResponse.json({ message: 'Service Unavailable' }, { status: 503 }),
         ),
       );

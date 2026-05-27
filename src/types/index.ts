@@ -98,7 +98,7 @@ export interface Account {
 }
 
 export interface AccountSummary {
-  account: { id: string; name: string };
+  accountName: string ;
   incomeSettled: number;
   incomeNotSettled: number;
   expenseSettled: number;
