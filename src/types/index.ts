@@ -97,6 +97,14 @@ export interface Account {
   updatedAt: string;
 }
 
+export interface AccountSummary {
+  accountName: string ;
+  incomeSettled: number;
+  incomeNotSettled: number;
+  expenseSettled: number;
+  expenseNotSettled: number;
+}
+
 export interface CreateAccountPayload {
   name: string;  
   description?: string;

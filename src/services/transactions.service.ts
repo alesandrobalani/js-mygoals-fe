@@ -1,5 +1,5 @@
 import api from './api';
-import type { CreateTransactionPayload, PaginatedTransactions, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
+import type { AccountSummary, CreateTransactionPayload, PaginatedTransactions, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
 
 export const transactionsService = {
   async getSummary(startDate: string, endDate: string): Promise<TransactionSummary> {
@@ -30,4 +30,12 @@ export const transactionsService = {
     const { data } = await api.put<Transaction>(`/transactions/${id}`, payload);
     return data;
   },
+
+    async getAccountSummary(endDate: string): Promise<AccountSummary[]> {
+    const { data } = await api.get<AccountSummary[]>('/transactions/summaryByAccount', {
+      params: { endDate },
+    });
+    return data;
+  },
+
 };

@@ -1,0 +1,7 @@
+Quero criar um novo menu de dashboard com a visão de contas.
+Neste dashboard quero ter os cards quero uma visão de saldo efetivado e saldo estimado para cada conta existente no cadastro.
+O dashboard principal continuará sendo o de transação, e apenas deverá ter o nome reformulado para representar corretamente seu escopo.
+Para buscar os dados das contas, deverá ser realizada uma consulta no backend da sumarização dos dados de cada conta, separado por receita e despesa até o mês corrente.
+Não implemente o código do backend, apenas a chamada do novo método que será criado posteriormente.
+Crie os testes automatizados para a nova funcionalidade.
+Atualize o README da aplicação.

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import {
   accountsList,
+  accountSummaryList,
   adminUser,
   authResponse,
   categoriesList,
@@ -91,5 +92,9 @@ export const handlers = [
   
   http.post(`${BASE}/transaction-items`, () => {
     return HttpResponse.json(createdTransactionItem, { status: 201 });
+  }),
+
+  http.get(`${BASE}/transactions/summaryByAccount`, () => {
+    return HttpResponse.json(accountSummaryList);
   }),
 ];

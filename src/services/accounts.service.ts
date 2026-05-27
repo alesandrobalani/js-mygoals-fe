@@ -7,8 +7,9 @@ export const accountsService = {
     return data;
   },
 
-    async create(payload: CreateAccountPayload): Promise<Account> {
+  async create(payload: CreateAccountPayload): Promise<Account> {
     const { data } = await api.post<Account>('/accounts', payload);
     return data;
   },
+
 };

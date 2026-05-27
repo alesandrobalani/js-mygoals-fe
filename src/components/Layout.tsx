@@ -16,7 +16,10 @@ export function Layout() {
   const navLinks =
     user?.role === UserRole.ADMIN
       ? [{ to: '/users', label: 'Usuários' }]
-      : [{ to: '/dashboard', label: 'Dashboard' }];
+      : [
+          { to: '/dashboard', label: 'Transações' },
+          { to: '/contas', label: 'Contas' },
+        ];
 
   return (
     <LayoutView
