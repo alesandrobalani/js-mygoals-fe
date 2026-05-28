@@ -1,10 +1,33 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { DashboardPage } from '../DashboardPage';
 import { renderWithProviders } from '../../test/render-helpers';
 import { server } from '../../test/mocks/server';
 import { transactionSummary } from '../../test/mocks/fixtures';
+
+const MONTH_NAMES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+function getCurrentMonthLabel() {
+  const now = new Date();
+  return `${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+function getPrevMonthLabel() {
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return `${MONTH_NAMES[prev.getMonth()]} ${prev.getFullYear()}`;
+}
+
+function getNextMonthLabel() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return `${MONTH_NAMES[next.getMonth()]} ${next.getFullYear()}`;
+}
 
 describe('DashboardPage', () => {
   beforeEach(() => {
@@ -60,6 +83,52 @@ describe('DashboardPage', () => {
       renderWithProviders(<DashboardPage />);
 
       expect(screen.queryByText('Saldo total')).not.toBeInTheDocument();
+    });
+
+    it('displays current month label on load', async () => {
+      renderWithProviders(<DashboardPage />);
+
+      await waitFor(() => {
+        expect(screen.getByText(getCurrentMonthLabel())).toBeInTheDocument();
+      });
+    });
+
+    it('navigates to previous month when clicking prev button', async () => {
+      renderWithProviders(<DashboardPage />);
+
+      await waitFor(() => expect(screen.getByText(getCurrentMonthLabel())).toBeInTheDocument());
+
+      await userEvent.click(screen.getByRole('button', { name: 'Mês anterior' }));
+
+      expect(screen.getByText(getPrevMonthLabel())).toBeInTheDocument();
+    });
+
+    it('navigates to next month when clicking next button', async () => {
+      renderWithProviders(<DashboardPage />);
+
+      await waitFor(() => expect(screen.getByText(getCurrentMonthLabel())).toBeInTheDocument());
+
+      await userEvent.click(screen.getByRole('button', { name: 'Próximo mês' }));
+
+      expect(screen.getByText(getNextMonthLabel())).toBeInTheDocument();
+    });
+
+    it('reloads summary data when month changes', async () => {
+      let callCount = 0;
+      server.use(
+        http.get('http://localhost:3000/transactions/summary', () => {
+          callCount++;
+          return HttpResponse.json(transactionSummary);
+        }),
+      );
+
+      renderWithProviders(<DashboardPage />);
+      await waitFor(() => expect(screen.getByText(getCurrentMonthLabel())).toBeInTheDocument());
+      const initialCallCount = callCount;
+
+      await userEvent.click(screen.getByRole('button', { name: 'Mês anterior' }));
+
+      await waitFor(() => expect(callCount).toBeGreaterThan(initialCallCount));
     });
   });
 

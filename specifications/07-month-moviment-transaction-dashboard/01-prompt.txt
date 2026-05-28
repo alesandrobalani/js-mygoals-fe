@@ -1,0 +1,7 @@
+No dashboard de transações quero que os dados apresentados nos cards e grids variem de acordo com o mês.
+Para isto quero que visualmente o ao abrir o dash seja apresentado o mês corrente, e que o usuário tenha a condição de alterar os meses, tanto para antes como para depois do mês corrente.
+Esta movimentação pode ser realizada passando para frente e para trás 1 mês, mas também ele pode ter a opção de selecionar o mês e ano desejado.
+A usabilidade deve ser simples.
+Sempre que a competência for alterada, os dados do dashboard devem ser atualizados para o mês selecionado.
+Devem ser ajustados os testes automatizados para validar este comportamento.
+A documentação da aplicação deve ser atualizada.
