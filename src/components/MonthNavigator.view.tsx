@@ -17,7 +17,6 @@ export function MonthNavigatorView({ year, month, onPrev, onNext, onChange }: Mo
   function handlePickerChange(e: React.ChangeEvent<HTMLInputElement>) {
     const [y, m] = e.target.value.split('-').map(Number);
     onChange(y, m - 1);
-    e.target.blur();
   }
 
   return (

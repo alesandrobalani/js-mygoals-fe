@@ -3,15 +3,10 @@ import { useAuth } from '../contexts/AuthContext';
 import type { AccountSummary } from '../types';
 import { AccountsDashboardView } from './AccountsDashboardPage.view';
 import { transactionsService } from '../services/transactions.service';
+import { getMonthRange } from '../utils/date';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-}
-
-function getCurrentMonthEndDate(): string {
-  const now = new Date();
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return end.toISOString().split('T')[0];
 }
 
 function balanceColor(value: number): string {
@@ -20,25 +15,45 @@ function balanceColor(value: number): string {
 
 export function AccountsDashboardPage() {
   const { user } = useAuth();
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
   const [summaries, setSummaries] = useState<AccountSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const { endDate } = getMonthRange(selectedYear, selectedMonth);
+
   useEffect(() => {
-    const endDate = getCurrentMonthEndDate();
+    setLoading(true);
     transactionsService
       .getAccountSummary(endDate)
       .then((data) => setSummaries(data))
       .catch(() => setError('Erro ao carregar resumo de contas.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [endDate]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-16">
-        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+  function handlePrevMonth() {
+    if (selectedMonth === 0) {
+      setSelectedYear((y) => y - 1);
+      setSelectedMonth(11);
+    } else {
+      setSelectedMonth((m) => m - 1);
+    }
+  }
+
+  function handleNextMonth() {
+    if (selectedMonth === 11) {
+      setSelectedYear((y) => y + 1);
+      setSelectedMonth(0);
+    } else {
+      setSelectedMonth((m) => m + 1);
+    }
+  }
+
+  function handleMonthChange(year: number, month: number) {
+    setSelectedYear(year);
+    setSelectedMonth(month);
   }
 
   const accounts = summaries.map((s) => {
@@ -55,7 +70,13 @@ export function AccountsDashboardPage() {
     <AccountsDashboardView
       userName={user?.name}
       accounts={accounts}
+      loading={loading}
       error={error}
+      year={selectedYear}
+      month={selectedMonth}
+      onPrevMonth={handlePrevMonth}
+      onNextMonth={handleNextMonth}
+      onMonthChange={handleMonthChange}
     />
   );
 }

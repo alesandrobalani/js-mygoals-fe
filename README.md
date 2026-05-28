@@ -16,7 +16,7 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Rotas protegidas por JWT
 - Layout responsivo para Web desktop e Mobile Android
 - **Dashboard de Transações** (`/dashboard`): cards de saldo, receitas e despesas com navegação por mês (anterior/próximo e seleção direta de mês/ano)
-- **Dashboard de Contas** (`/contas`): saldo efetivado e estimado por conta cadastrada
+- **Dashboard de Contas** (`/contas`): saldo efetivado e estimado por conta com navegação por mês (anterior/próximo e seleção direta de mês/ano)
 - Grid de transações do mês selecionado com paginação (20 / 50 / 100 registros por página)
 - Criação e edição de transações via modal no dashboard (com atualização automática do grid e resumo)
 - Criação rápida de categoria, conta e item inline no modal de transação
@@ -86,11 +86,11 @@ src/
   types/        # Tipagens compartilhadas
 ```
 
-## Navegação por mês no Dashboard
+## Navegação por mês
 
-Ao abrir o Dashboard de Transações, o mês corrente é exibido automaticamente. Para trocar a competência:
+Ambos os dashboards (Transações e Contas) abrem no mês corrente automaticamente. Para trocar a competência:
 
 - **`←` / `→`** — navega um mês para trás ou para frente
 - **Clique no rótulo do mês** (ex.: "Maio 2026") — abre um seletor nativo de mês/ano para ir direto a qualquer período
 
-Todos os cards de resumo e a grade de transações são atualizados automaticamente ao mudar o mês.
+No Dashboard de Transações, todos os cards de resumo e a grade de transações são atualizados ao mudar o mês. No Dashboard de Contas, os saldos efetivado e estimado de cada conta são atualizados para o mês selecionado.
