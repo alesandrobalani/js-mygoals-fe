@@ -1,0 +1,3 @@
+De o mesmo comportamento de movimentação nas competências para o dashboard de contas.
+Ajustes os testes automatizados.
+Ajuste a documentação.
