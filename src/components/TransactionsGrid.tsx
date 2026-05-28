@@ -3,22 +3,15 @@ import type { Transaction } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { TransactionsGridView } from './TransactionsGrid.view';
 
-
-function getCurrentMonthRange(): { startDate: string; endDate: string } {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return {
-    startDate: start.toISOString().split('T')[0],
-    endDate: end.toISOString().split('T')[0],
-  };
-}
-
 export function TransactionsGrid({
   refreshKey = 0,
+  startDate,
+  endDate,
   onEditTransaction,
 }: {
   refreshKey?: number;
+  startDate: string;
+  endDate: string;
   onEditTransaction: (tx: Transaction) => void;
 }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -30,7 +23,10 @@ export function TransactionsGrid({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const { startDate, endDate } = getCurrentMonthRange();
+    setPage(1);
+  }, [startDate, endDate]);
+
+  useEffect(() => {
     setLoading(true);
     setError('');
     transactionsService
@@ -42,7 +38,7 @@ export function TransactionsGrid({
       })
       .catch(() => setError('Erro ao carregar transações.'))
       .finally(() => setLoading(false));
-  }, [page, limit, refreshKey]);
+  }, [startDate, endDate, page, limit, refreshKey]);
 
   function handleLimitChange(newLimit: number) {
     setLimit(newLimit);

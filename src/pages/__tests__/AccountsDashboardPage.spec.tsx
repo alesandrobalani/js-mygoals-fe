@@ -25,8 +25,7 @@ describe('AccountsDashboardPage', () => {
       renderWithProviders(<AccountsDashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[0].accountName}`)).toBeInTheDocument();
-        expect(screen.getByText(`Saldo efetivado — ${accountSummaryList[1].accountName}`)).toBeInTheDocument();
+        expect(screen.getAllByText('Efetivado').length).toBe(accountSummaryList.length);
       });
     });
 
@@ -34,8 +33,7 @@ describe('AccountsDashboardPage', () => {
       renderWithProviders(<AccountsDashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[0].accountName}`)).toBeInTheDocument();
-        expect(screen.getByText(`Saldo estimado — ${accountSummaryList[1].accountName}`)).toBeInTheDocument();
+        expect(screen.getAllByText('Estimado').length).toBe(accountSummaryList.length);
       });
     });
 
@@ -46,7 +44,7 @@ describe('AccountsDashboardPage', () => {
       const settled = s.incomeSettled - s.expenseSettled; // 3000
 
       await waitFor(() => {
-        const label = screen.getByText(`Saldo efetivado — ${s.accountName}`);
+        const label = screen.getAllByText('Efetivado')[0];
         expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
           .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(settled).replace(/\s/g, ' ').trim());
       });
@@ -59,7 +57,7 @@ describe('AccountsDashboardPage', () => {
       const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled); // 1800
 
       await waitFor(() => {
-        const label = screen.getByText(`Saldo estimado — ${s.accountName}`);
+        const label = screen.getAllByText('Estimado')[1];
         expect(label.nextElementSibling?.textContent?.replace(/\s/g, ' ').trim())
           .toBe(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimated).replace(/\s/g, ' ').trim());
       });

@@ -5,23 +5,17 @@ import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
 import { TransactionsGrid } from '../components/TransactionsGrid';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
+import { getMonthRange } from '../utils/date';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-function getCurrentMonthRange(): { startDate: string; endDate: string } {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return {
-    startDate: start.toISOString().split('T')[0],
-    endDate: end.toISOString().split('T')[0],
-  };
-}
-
 export function DashboardPage() {
   const { user } = useAuth();
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
   const [incomeSettled, setIncomeSettled] = useState(0);
   const [incomeNotSettled, setIncomeNotSettled] = useState(0);
   const [expenseSettled, setExpenseSettled] = useState(0);
@@ -32,8 +26,10 @@ export function DashboardPage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const { startDate, endDate } = getMonthRange(selectedYear, selectedMonth);
+
   useEffect(() => {
-    const { startDate, endDate } = getCurrentMonthRange();
+    setLoading(true);
     transactionsService
       .getSummary(startDate, endDate)
       .then((summary) => {
@@ -44,7 +40,30 @@ export function DashboardPage() {
       })
       .catch(() => setError('Erro ao carregar resumo financeiro.'))
       .finally(() => setLoading(false));
-  }, [refreshKey]);
+  }, [startDate, endDate, refreshKey]);
+
+  function handlePrevMonth() {
+    if (selectedMonth === 0) {
+      setSelectedYear((y) => y - 1);
+      setSelectedMonth(11);
+    } else {
+      setSelectedMonth((m) => m - 1);
+    }
+  }
+
+  function handleNextMonth() {
+    if (selectedMonth === 11) {
+      setSelectedYear((y) => y + 1);
+      setSelectedMonth(0);
+    } else {
+      setSelectedMonth((m) => m + 1);
+    }
+  }
+
+  function handleMonthChange(year: number, month: number) {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+  }
 
   function handleTransactionCreated() {
     setRefreshKey((k) => k + 1);
@@ -68,9 +87,9 @@ export function DashboardPage() {
   }
 
   const cards = [
-    { label: 'Despesas estimadas mês', value: formatCurrency(expenseSettled+expenseNotSettled), color: 'text-red-500' },
+    { label: 'Despesas estimadas mês', value: formatCurrency(expenseSettled + expenseNotSettled), color: 'text-red-500' },
     { label: 'Despesas efetivadas mês', value: formatCurrency(expenseSettled), color: 'text-red-500' },
-    { label: 'Receitas estimadas mês', value: formatCurrency(incomeSettled+incomeNotSettled), color: 'text-emerald-600' },
+    { label: 'Receitas estimadas mês', value: formatCurrency(incomeSettled + incomeNotSettled), color: 'text-emerald-600' },
     { label: 'Receitas efetivadas mês', value: formatCurrency(incomeSettled), color: 'text-emerald-600' },
     { label: 'Saldo estimado total', value: formatCurrency((incomeSettled + incomeNotSettled) - (expenseSettled + expenseNotSettled)), color: 'text-sky-600' },
     { label: 'Saldo efetivado total', value: formatCurrency(incomeSettled - expenseSettled), color: 'text-sky-600' },
@@ -82,9 +101,19 @@ export function DashboardPage() {
         userName={user?.name}
         cards={cards}
         error={error}
+        year={selectedYear}
+        month={selectedMonth}
         onOpenModal={() => setIsModalOpen(true)}
+        onPrevMonth={handlePrevMonth}
+        onNextMonth={handleNextMonth}
+        onMonthChange={handleMonthChange}
       />
-      <TransactionsGrid refreshKey={refreshKey} onEditTransaction={handleEditTransaction} />
+      <TransactionsGrid
+        refreshKey={refreshKey}
+        startDate={startDate}
+        endDate={endDate}
+        onEditTransaction={handleEditTransaction}
+      />
       {isModalOpen && (
         <CreateTransactionModal
           onClose={() => setIsModalOpen(false)}

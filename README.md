@@ -15,9 +15,9 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Gestão de usuários: listagem e criação (apenas Admin)
 - Rotas protegidas por JWT
 - Layout responsivo para Web desktop e Mobile Android
-- **Dashboard de Transações** (`/dashboard`): cards de saldo, receitas e despesas do mês corrente
+- **Dashboard de Transações** (`/dashboard`): cards de saldo, receitas e despesas com navegação por mês (anterior/próximo e seleção direta de mês/ano)
 - **Dashboard de Contas** (`/contas`): saldo efetivado e estimado por conta cadastrada
-- Grid de transações do mês corrente com paginação (20 / 50 / 100 registros por página)
+- Grid de transações do mês selecionado com paginação (20 / 50 / 100 registros por página)
 - Criação e edição de transações via modal no dashboard (com atualização automática do grid e resumo)
 - Criação rápida de categoria, conta e item inline no modal de transação
 
@@ -79,8 +79,18 @@ npm run preview
 ```
 src/
   contexts/     # AuthContext (estado de autenticação global)
-  components/   # Layout, ProtectedRoute, TransactionsGrid
+  components/   # Layout, ProtectedRoute, TransactionsGrid, MonthNavigator
   pages/        # LoginPage, DashboardPage, AccountsDashboardPage, UsersPage, CreateUserPage
   services/     # api.ts (axios), auth.service.ts, users.service.ts, transactions.service.ts, accounts.service.ts
+  utils/        # date.ts (getMonthRange)
   types/        # Tipagens compartilhadas
 ```
+
+## Navegação por mês no Dashboard
+
+Ao abrir o Dashboard de Transações, o mês corrente é exibido automaticamente. Para trocar a competência:
+
+- **`←` / `→`** — navega um mês para trás ou para frente
+- **Clique no rótulo do mês** (ex.: "Maio 2026") — abre um seletor nativo de mês/ano para ir direto a qualquer período
+
+Todos os cards de resumo e a grade de transações são atualizados automaticamente ao mudar o mês.

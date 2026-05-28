@@ -1,3 +1,5 @@
+import { MonthNavigatorView } from '../components/MonthNavigator.view';
+
 interface StatCard {
   label: string;
   value: string;
@@ -8,10 +10,25 @@ interface DashboardViewProps {
   userName: string | undefined;
   cards: StatCard[];
   error: string;
+  year: number;
+  month: number;
   onOpenModal: () => void;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
+  onMonthChange: (year: number, month: number) => void;
 }
 
-export function DashboardView({ userName, cards, error, onOpenModal }: DashboardViewProps) {
+export function DashboardView({
+  userName,
+  cards,
+  error,
+  year,
+  month,
+  onOpenModal,
+  onPrevMonth,
+  onNextMonth,
+  onMonthChange,
+}: DashboardViewProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -23,7 +40,15 @@ export function DashboardView({ userName, cards, error, onOpenModal }: Dashboard
           + Nova Transação
         </button>
       </div>
-      <p className="text-slate-500 mb-8">Bem-vindo ao MyGoals — seu controle financeiro familiar.</p>
+      <p className="text-slate-500 mb-6">Bem-vindo ao MyGoals — seu controle financeiro familiar.</p>
+
+      <MonthNavigatorView
+        year={year}
+        month={month}
+        onPrev={onPrevMonth}
+        onNext={onNextMonth}
+        onChange={onMonthChange}
+      />
 
       {error && (
         <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
