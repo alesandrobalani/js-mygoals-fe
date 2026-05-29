@@ -59,6 +59,8 @@ export function TransactionsGridView({
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Descrição</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Conta</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Tipo</th>
+                <th className="text-left px-6 py-3 font-medium text-slate-600">Categoria</th>
+                <th className="text-left px-6 py-3 font-medium text-slate-600">Item</th>
                 <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Efetivado</th>
@@ -96,6 +98,8 @@ export function TransactionsGridView({
                       </span>
                     )}
                   </td>
+                  <td className="px-6 py-4 text-slate-800">{tx.category?.name ?? '—'}</td>
+                  <td className="px-6 py-4 text-slate-800">{tx.transactionItem?.name ?? '—'}</td>
                   <td
                     className={`px-6 py-4 text-right font-medium ${
                       tx.type === TransactionType.INCOME ? 'text-emerald-600' : 'text-red-500'
