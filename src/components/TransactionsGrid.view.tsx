@@ -57,6 +57,7 @@ export function TransactionsGridView({
               <tr className="border-b border-slate-200 bg-slate-50">
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Data</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Descrição</th>
+                <th className="text-left px-6 py-3 font-medium text-slate-600">Conta</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Tipo</th>
                 <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
@@ -75,6 +76,7 @@ export function TransactionsGridView({
                 >
                   <td className="px-6 py-4 text-slate-500">{tx.transactionDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-800">{tx.description ?? '—'}</td>
+                  <td className="px-6 py-4 text-slate-800">{tx.account?.name ?? '—'}</td>
                   <td className="px-6 py-4">
                     {tx.type === TransactionType.INCOME ? (
                       <span aria-label="Receita" title="Receita">
