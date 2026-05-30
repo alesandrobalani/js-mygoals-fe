@@ -117,6 +117,151 @@ describe('TransactionsGrid', () => {
     });
   });
 
+  describe('filter', () => {
+    it('renders the filter input', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      expect(screen.getByRole('textbox', { name: 'Filtrar transações' })).toBeInTheDocument();
+    });
+
+    it('shows only matching rows when filter text is typed', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'supermercado');
+
+      expect(screen.getByText('Supermercado')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+      expect(screen.queryByText('Conta de luz')).not.toBeInTheDocument();
+    });
+
+    it('restores all rows when filter is cleared', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      const input = screen.getByRole('textbox', { name: 'Filtrar transações' });
+      await userEvent.type(input, 'supermercado');
+      await userEvent.clear(input);
+
+      await waitFor(() => {
+        expect(screen.getByText('Salário')).toBeInTheDocument();
+        expect(screen.getByText('Supermercado')).toBeInTheDocument();
+        expect(screen.getByText('Conta de luz')).toBeInTheDocument();
+      });
+    });
+
+    it('filters case-insensitively', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'SALÁRIO');
+
+      expect(screen.getByText('Salário')).toBeInTheDocument();
+      expect(screen.queryByText('Supermercado')).not.toBeInTheDocument();
+    });
+
+    it('filters by category name', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'Alimentação');
+
+      expect(screen.getByText('Supermercado')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+    });
+
+    it('shows empty state when filter matches nothing', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'Filtrar transações' }),
+        'xyzinexistente',
+      );
+
+      expect(screen.getByText('Nenhuma transação no período.')).toBeInTheDocument();
+    });
+
+    it('filters by transaction type "receita"', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'receita');
+
+      expect(screen.getByText('Salário')).toBeInTheDocument();
+      expect(screen.queryByText('Supermercado')).not.toBeInTheDocument();
+      expect(screen.queryByText('Conta de luz')).not.toBeInTheDocument();
+    });
+
+    it('filters by transaction type "despesa"', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'despesa');
+
+      expect(screen.getByText('Supermercado')).toBeInTheDocument();
+      expect(screen.getByText('Conta de luz')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+    });
+
+    it('filters by settled status "pendente"', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'pendente');
+
+      expect(screen.getByText('Conta de luz')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+      expect(screen.queryByText('Supermercado')).not.toBeInTheDocument();
+    });
+
+    it('filters by settled status "efetivado"', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), 'efetivado');
+
+      expect(screen.getByText('Salário')).toBeInTheDocument();
+      expect(screen.getByText('Supermercado')).toBeInTheDocument();
+      expect(screen.queryByText('Conta de luz')).not.toBeInTheDocument();
+    });
+
+    it('filters by formatted amount', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), '200,00');
+
+      expect(screen.getByText('Conta de luz')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+      expect(screen.queryByText('Supermercado')).not.toBeInTheDocument();
+    });
+
+    it('filters by transaction date', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Filtrar transações' }), '2026-04-10');
+
+      expect(screen.getByText('Supermercado')).toBeInTheDocument();
+      expect(screen.queryByText('Salário')).not.toBeInTheDocument();
+      expect(screen.queryByText('Conta de luz')).not.toBeInTheDocument();
+    });
+  });
+
   describe('bad flow', () => {
     it('shows error message when backend returns 500', async () => {
       server.use(

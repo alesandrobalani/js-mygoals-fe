@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Transaction } from '../types';
+import { TransactionType } from '../types';
 import { transactionsService } from '../services/transactions.service';
-import { TransactionsGridView } from './TransactionsGrid.view';
+import { TransactionsGridView, formatCurrency } from './TransactionsGrid.view';
 
 export function TransactionsGrid({
   refreshKey = 0,
@@ -21,9 +22,31 @@ export function TransactionsGrid({
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [filterText, setFilterText] = useState('');
+
+  const filteredTransactions = useMemo(() => {
+    if (!filterText) return transactions;
+    const lower = filterText.toLowerCase();
+    return transactions.filter((tx) => {
+      const typeLabel = tx.type === TransactionType.INCOME ? 'receita' : 'despesa';
+      const settledLabel = tx.settled ? 'efetivado' : 'pendente';
+      return (
+        (tx.description ?? '').toLowerCase().includes(lower) ||
+        (tx.account?.name ?? '').toLowerCase().includes(lower) ||
+        (tx.category?.name ?? '').toLowerCase().includes(lower) ||
+        (tx.transactionItem?.name ?? '').toLowerCase().includes(lower) ||
+        (tx.dueDate ?? '').toLowerCase().includes(lower) ||
+        (tx.transactionDate ?? '').toLowerCase().includes(lower) ||
+        typeLabel.includes(lower) ||
+        settledLabel.includes(lower) ||
+        formatCurrency(tx.amount).toLowerCase().includes(lower)
+      );
+    });
+  }, [transactions, filterText]);
 
   useEffect(() => {
     setPage(1);
+    setFilterText('');
   }, [startDate, endDate]);
 
   useEffect(() => {
@@ -47,13 +70,15 @@ export function TransactionsGrid({
 
   return (
     <TransactionsGridView
-      transactions={transactions}
+      transactions={filteredTransactions}
       total={total}
       page={page}
       totalPages={totalPages}
       limit={limit}
       loading={loading}
       error={error}
+      filterText={filterText}
+      onFilterChange={setFilterText}
       onPageChange={setPage}
       onLimitChange={handleLimitChange}
       onEditTransaction={onEditTransaction}

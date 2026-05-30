@@ -1,0 +1,3 @@
+Quero que seja adiciona no grid de transações uma opção para filtrar as linhas conforme o texto digitado no filtro.
+Quero que o filtro sensibilize todas as colunas do GRID.
+Crie os testes automatizados para este novo comportamento.

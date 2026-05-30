@@ -12,12 +12,14 @@ interface TransactionsGridViewProps {
   limit: number;
   loading: boolean;
   error: string;
+  filterText: string;
+  onFilterChange: (text: string) => void;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
   onEditTransaction: (tx: Transaction) => void;
 }
 
-function formatCurrency(value: number): string {
+export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
@@ -28,13 +30,25 @@ export function TransactionsGridView({
   limit,
   loading,
   error,
+  filterText,
+  onFilterChange,
   onPageChange,
   onLimitChange,
   onEditTransaction,
 }: TransactionsGridViewProps) {
   return (
     <div className="mt-8">
-      <h2 className="text-lg font-semibold text-slate-700 mb-4">Transações do mês</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-slate-700">Transações do mês</h2>
+        <input
+          type="text"
+          value={filterText}
+          onChange={(e) => onFilterChange(e.target.value)}
+          placeholder="Filtrar transações..."
+          aria-label="Filtrar transações"
+          className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent w-64"
+        />
+      </div>
 
       {error && (
         <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -55,6 +69,7 @@ export function TransactionsGridView({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Data</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Descrição</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Conta</th>
@@ -62,7 +77,6 @@ export function TransactionsGridView({
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Categoria</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Item</th>
                 <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Efetivado</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -76,6 +90,7 @@ export function TransactionsGridView({
                     tx.type === TransactionType.INCOME ? 'bg-emerald-50/60' : 'bg-red-50/40',
                   ].join(' ')}
                 >
+                  <td className="px-6 py-4 text-slate-500">{tx.dueDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-500">{tx.transactionDate ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-800">{tx.description ?? '—'}</td>
                   <td className="px-6 py-4 text-slate-800">{tx.account?.name ?? '—'}</td>
@@ -107,7 +122,6 @@ export function TransactionsGridView({
                   >
                     {formatCurrency(tx.amount)}
                   </td>
-                  <td className="px-6 py-4 text-slate-500">{tx.dueDate ?? '—'}</td>
                   <td className="px-6 py-4">
                     {tx.settled ? (
                       <span aria-label="Efetivado" title="Efetivado">
