@@ -19,6 +19,7 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - **Dashboard de Contas** (`/contas`): saldo efetivado e estimado por conta com navegação por mês (anterior/próximo e seleção direta de mês/ano)
 - Grid de transações do mês selecionado com paginação (20 / 50 / 100 registros por página)
 - Criação e edição de transações via modal no dashboard (com atualização automática do grid e resumo)
+- Remoção de transação com confirmação (atualiza grid e resumo após exclusão)
 - Criação rápida de categoria, conta e item inline no modal de transação
 
 ## Pré-requisitos

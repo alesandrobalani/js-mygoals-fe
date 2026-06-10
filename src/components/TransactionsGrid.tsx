@@ -3,17 +3,20 @@ import type { Transaction } from '../types';
 import { TransactionType } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { TransactionsGridView, formatCurrency } from './TransactionsGrid.view';
+import { ConfirmDialog } from './ConfirmDialog';
 
 export function TransactionsGrid({
   refreshKey = 0,
   startDate,
   endDate,
   onEditTransaction,
+  onDeleteSuccess,
 }: {
   refreshKey?: number;
   startDate: string;
   endDate: string;
   onEditTransaction: (tx: Transaction) => void;
+  onDeleteSuccess?: () => void;
 }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
@@ -23,6 +26,10 @@ export function TransactionsGrid({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterText, setFilterText] = useState('');
+  const [deleteKey, setDeleteKey] = useState(0);
+  const [transactionToRemove, setTransactionToRemove] = useState<Transaction | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState('');
 
   const filteredTransactions = useMemo(() => {
     if (!filterText) return transactions;
@@ -61,27 +68,54 @@ export function TransactionsGrid({
       })
       .catch(() => setError('Erro ao carregar transações.'))
       .finally(() => setLoading(false));
-  }, [startDate, endDate, page, limit, refreshKey]);
+  }, [startDate, endDate, page, limit, refreshKey, deleteKey]);
 
   function handleLimitChange(newLimit: number) {
     setLimit(newLimit);
     setPage(1);
   }
 
+  async function handleConfirmRemove() {
+    if (!transactionToRemove) return;
+    setRemoving(true);
+    setRemoveError('');
+    try {
+      await transactionsService.delete(transactionToRemove.id);
+      setTransactionToRemove(null);
+      setDeleteKey((k) => k + 1);
+      onDeleteSuccess?.();
+    } catch {
+      setRemoveError('Erro ao remover transação.');
+    } finally {
+      setRemoving(false);
+    }
+  }
+
   return (
-    <TransactionsGridView
-      transactions={filteredTransactions}
-      total={total}
-      page={page}
-      totalPages={totalPages}
-      limit={limit}
-      loading={loading}
-      error={error}
-      filterText={filterText}
-      onFilterChange={setFilterText}
-      onPageChange={setPage}
-      onLimitChange={handleLimitChange}
-      onEditTransaction={onEditTransaction}
-    />
+    <>
+      <TransactionsGridView
+        transactions={filteredTransactions}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        limit={limit}
+        loading={loading}
+        error={removeError || error}
+        filterText={filterText}
+        onFilterChange={setFilterText}
+        onPageChange={setPage}
+        onLimitChange={handleLimitChange}
+        onEditTransaction={onEditTransaction}
+        onRemoveTransaction={setTransactionToRemove}
+      />
+      {transactionToRemove && (
+        <ConfirmDialog
+          message={`Deseja remover a transação "${transactionToRemove.description ?? 'selecionada'}"?`}
+          onConfirm={handleConfirmRemove}
+          onCancel={() => { setTransactionToRemove(null); setRemoveError(''); }}
+          loading={removing}
+        />
+      )}
+    </>
   );
 }
