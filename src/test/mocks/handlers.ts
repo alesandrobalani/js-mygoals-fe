@@ -97,4 +97,8 @@ export const handlers = [
   http.get(`${BASE}/transactions/summaryByAccount`, () => {
     return HttpResponse.json(accountSummaryList);
   }),
+
+  http.delete(`${BASE}/transactions/:id`, () => {
+    return new HttpResponse(null, { status: 204 });
+  }),
 ];

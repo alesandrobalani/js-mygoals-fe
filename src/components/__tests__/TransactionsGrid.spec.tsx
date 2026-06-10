@@ -262,6 +262,88 @@ describe('TransactionsGrid', () => {
     });
   });
 
+  describe('remove transaction', () => {
+    it('renders a remove button for each transaction row', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => {
+        const removeButtons = screen.getAllByRole('button', { name: 'Remover transação' });
+        expect(removeButtons).toHaveLength(transactionsList.length);
+      });
+    });
+
+    it('opens ConfirmDialog when remove button is clicked', async () => {
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument());
+
+      const removeButtons = screen.getAllByRole('button', { name: 'Remover transação' });
+      await userEvent.click(removeButtons[0]);
+
+      expect(screen.getByRole('button', { name: 'Confirmar' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
+    });
+
+    it('closes dialog without calling API when cancel is clicked', async () => {
+      let deleteCalled = false;
+      server.use(
+        http.delete('http://localhost:3000/transactions/:id', () => {
+          deleteCalled = true;
+          return new HttpResponse(null, { status: 204 });
+        }),
+      );
+
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument());
+
+      await userEvent.click(screen.getAllByRole('button', { name: 'Remover transação' })[0]);
+      await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+      expect(screen.queryByRole('button', { name: 'Confirmar' })).not.toBeInTheDocument();
+      expect(deleteCalled).toBe(false);
+    });
+
+    it('calls DELETE API and refreshes grid when confirm is clicked', async () => {
+      let deleteCalledId: string | undefined;
+      server.use(
+        http.delete('http://localhost:3000/transactions/:id', ({ params }) => {
+          deleteCalledId = params.id as string;
+          return new HttpResponse(null, { status: 204 });
+        }),
+      );
+
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument());
+
+      await userEvent.click(screen.getAllByRole('button', { name: 'Remover transação' })[0]);
+      await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Confirmar' })).not.toBeInTheDocument());
+      expect(deleteCalledId).toBe(transactionsList[0].id);
+    });
+
+    it('shows error message when DELETE API returns 500', async () => {
+      server.use(
+        http.delete('http://localhost:3000/transactions/:id', () =>
+          HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+        ),
+      );
+
+      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
+
+      await waitFor(() => expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument());
+
+      await userEvent.click(screen.getAllByRole('button', { name: 'Remover transação' })[0]);
+      await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+      await waitFor(() =>
+        expect(screen.getByText('Erro ao remover transação.')).toBeInTheDocument(),
+      );
+    });
+  });
+
   describe('bad flow', () => {
     it('shows error message when backend returns 500', async () => {
       server.use(

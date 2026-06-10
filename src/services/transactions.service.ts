@@ -38,4 +38,8 @@ export const transactionsService = {
     return data;
   },
 
+  async delete(id: string): Promise<void> {
+    await api.delete(`/transactions/${id}`);
+  },
+
 };

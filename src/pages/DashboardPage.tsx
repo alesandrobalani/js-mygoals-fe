@@ -113,6 +113,7 @@ export function DashboardPage() {
         startDate={startDate}
         endDate={endDate}
         onEditTransaction={handleEditTransaction}
+        onDeleteSuccess={() => setRefreshKey((k) => k + 1)}
       />
       {isModalOpen && (
         <CreateTransactionModal

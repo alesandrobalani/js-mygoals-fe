@@ -1,0 +1,5 @@
+Quero adicionar no grid de transação um ícone para remover uma transação.
+Ao acionar a operação ele deve solicitar a confirmação e confirmando realizar a chamada da remoção das transações ao backend.
+Ao final deverá ser atualizado os dados da página.
+Devem ser criados os testes automatizados.
+Deve ser atualizada a documentação da aplicação.
