@@ -10,6 +10,7 @@ import {
   createdTransaction,
   createdTransactionItem,
   paginatedTransactions,
+  strategicViewTransactions,
   transactionItemsList,
   transactionSummary,
   updatedTransaction,
@@ -100,5 +101,9 @@ export const handlers = [
 
   http.delete(`${BASE}/transactions/:id`, () => {
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get(`${BASE}/transactions/strategic-view`, () => {
+    return HttpResponse.json(strategicViewTransactions);
   }),
 ];

@@ -116,4 +116,17 @@ export interface TransactionItem {
   updatedAt: string;
 }
 
+export interface StrategicViewTransaction {
+  id: string;
+  description?: string;
+  amount: number;
+  type: TransactionType;
+  categoryName: string;
+  itemName: string;
+  accountName: string;
+  transactionDate: string;
+  dueDate: string;
+  settled: boolean;
+}
+
 
