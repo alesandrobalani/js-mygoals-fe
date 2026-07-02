@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AccountsDashboardPage } from './pages/AccountsDashboardPage';
+import { StrategicViewPage } from './pages/StrategicViewPage';
 import { UsersPage } from './pages/UsersPage';
 import { CreateUserPage } from './pages/CreateUserPage';
 
@@ -32,6 +33,7 @@ function App() {
               <Route element={<UserRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/contas" element={<AccountsDashboardPage />} />
+                <Route path="/visao-estrategica" element={<StrategicViewPage />} />
               </Route>
 
             </Route>

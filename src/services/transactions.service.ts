@@ -1,5 +1,5 @@
 import api from './api';
-import type { AccountSummary, CreateTransactionPayload, PaginatedTransactions, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
+import type { AccountSummary, CreateTransactionPayload, PaginatedTransactions, StrategicViewTransaction, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
 
 export const transactionsService = {
   async getSummary(startDate: string, endDate: string): Promise<TransactionSummary> {
@@ -40,6 +40,13 @@ export const transactionsService = {
 
   async delete(id: string): Promise<void> {
     await api.delete(`/transactions/${id}`);
+  },
+
+  async getStrategicView(startDate: string, endDate: string): Promise<StrategicViewTransaction[]> {
+    const { data } = await api.get<StrategicViewTransaction[]>('/transactions/strategic-view', {
+      params: { startDate, endDate },
+    });
+    return data;
   },
 
 };

@@ -1,0 +1,39 @@
+Quero fazer um novo menu para visão estratégica. Este novo menu deve permitir a visualização de forma estratégica das transações do período filtrado.
+Este novo menu deve apresentar um filtro de data inicial e final, que ao dash ser aberto deve ser carregado com a data inicial do mês corrente e a data final do mês corrente.
+A apresentação dos dados devem seguir o exemplo a seguir com a soma das transações:
+                Total
++ conta 1       R$ XXXX,XX
++ conta 2      -R$ YYYY,YY
+.
+.
+.
+--------------------------
+TOTAL          R$ ZZZZ,ZZ
+
+Ao expandir deve ser aberto com exempço: 
+
+                Total                  
+- conta 1       R$ XXXX,XX             
+    + Categoria 1     R$ AAAA,AA       
+    + Categoria 2     R$ BBBB,BB       
+- conta 2      -R$ YYYY,YY             
+    + Categoria 1     R$ AAAA,AA       
+    + Categoria 2     R$ BBBB,BB       
+.
+.
+.
+--------------------------
+TOTAL          R$ ZZZZ,ZZ
+
+A expanção pode ser feita da seguinte forma:
+- conta 
+   - Categoria
+     - Item
+       - venvimento
+          - tipo
+
+Adicione os seguintes para apresentação dos valores para os seguintes campos: Apenas efetivado, categoria, item. Permita multipla seleção para os filtros de categoria e item.
+
+Crie os testes automatizados com happy e bad flows.
+
+Atualize a documentação

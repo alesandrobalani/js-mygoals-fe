@@ -10,6 +10,7 @@ import {
   type Account,
   type AccountSummary,
   type TransactionItem,
+  type StrategicViewTransaction,
 } from '../../types';
 
 export const adminUser: User = {
@@ -167,5 +168,44 @@ export const accountSummaryList: AccountSummary[] = [
     incomeNotSettled: 0,
     expenseSettled: 1000,
     expenseNotSettled: 200,
+  },
+];
+
+export const strategicViewTransactions: StrategicViewTransaction[] = [
+  {
+    id: 'sv-1',
+    description: 'Salário',
+    amount: 5000,
+    type: TransactionType.INCOME,
+    categoryName: 'Renda',
+    itemName: 'Salário mensal',
+    accountName: 'Conta Corrente',
+    transactionDate: '2026-07-05T00:00:00.000Z',
+    dueDate: '2026-07-05T00:00:00.000Z',
+    settled: true,
+  },
+  {
+    id: 'sv-2',
+    description: 'Supermercado',
+    amount: 800,
+    type: TransactionType.EXPENSE,
+    categoryName: 'Alimentação',
+    itemName: 'Compras gerais',
+    accountName: 'Conta Corrente',
+    transactionDate: '2026-07-10T00:00:00.000Z',
+    dueDate: '2026-07-10T00:00:00.000Z',
+    settled: true,
+  },
+  {
+    id: 'sv-3',
+    description: 'Conta de luz',
+    amount: 200,
+    type: TransactionType.EXPENSE,
+    categoryName: 'Contas',
+    itemName: 'Energia elétrica',
+    accountName: 'Poupança',
+    transactionDate: '2026-07-15T00:00:00.000Z',
+    dueDate: '2026-07-17T00:00:00.000Z',
+    settled: false,
   },
 ];
