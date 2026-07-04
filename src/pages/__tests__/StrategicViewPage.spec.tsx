@@ -23,11 +23,11 @@ describe('StrategicViewPage', () => {
       expect(document.querySelector('.animate-spin')).toBeInTheDocument();
     });
 
-    it('renders categories names after data loads', async () => {
+    it('renders type names after data loads', async () => {
       renderWithProviders(<StrategicViewPage />);
       await waitFor(() => {
-        expect(screen.getByText('Renda')).toBeInTheDocument();
-        expect(screen.getByText('Alimentação')).toBeInTheDocument();
+        expect(screen.getByText('Receita')).toBeInTheDocument();
+        expect(screen.getByText('Despesa')).toBeInTheDocument();
       });
     });
 
@@ -50,7 +50,7 @@ describe('StrategicViewPage', () => {
       });
     });
 
-    it('displayscategories totals', async () => {
+    it('displays type totals', async () => {
       renderWithProviders(<StrategicViewPage />);
 
       await waitFor(() => {
@@ -59,64 +59,64 @@ describe('StrategicViewPage', () => {
       });
     });
 
-    it('expands an category row to show item', async () => {
+    it('expands an type row to show categories', async () => {
       renderWithProviders(<StrategicViewPage />);
 
-      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
 
-      await userEvent.click(screen.getByText('Alimentação'));
+      await userEvent.click(screen.getByText('Despesa'));
 
       await waitFor(() => {
-        expect(screen.getByText('Compras gerais')).toBeInTheDocument();
-        expect(screen.getByText('Mercado')).toBeInTheDocument();
+        expect(screen.getByText('Cuidados pessoais')).toBeInTheDocument();
+        expect(screen.getByText('Alimentação')).toBeInTheDocument();
       });
     });
 
-    it('collapses an expanded category when clicked again', async () => {
+    it('collapses an expanded type when clicked again', async () => {
       renderWithProviders(<StrategicViewPage />);
 
+      await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByText('Despesa'));
+      await waitFor(() => expect(screen.getByText('Cuidados pessoais')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByText('Despesa'));
+      await waitFor(() => expect(screen.queryByText('Cuidados pessoais')).not.toBeInTheDocument());
+    });
+
+    it('expands category row to show items', async () => {
+      renderWithProviders(<StrategicViewPage />);
+
+      await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
+      await userEvent.click(screen.getByText('Despesa'));
       await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
-
       await userEvent.click(screen.getByText('Alimentação'));
+
       await waitFor(() => expect(screen.getByText('Mercado')).toBeInTheDocument());
-
-      await userEvent.click(screen.getByText('Alimentação'));
-      await waitFor(() => expect(screen.queryByText('Mercado')).not.toBeInTheDocument());
     });
 
     it('expands item row to show due dates', async () => {
       renderWithProviders(<StrategicViewPage />);
 
-      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
-      await userEvent.click(screen.getByText('Alimentação'));
-      await waitFor(() => expect(screen.getByText('Mercado')).toBeInTheDocument());
-      await userEvent.click(screen.getByText('Mercado'));
-
-      await waitFor(() => expect(screen.getByText('17/07/2026')).toBeInTheDocument());
-    });
-
-    it('expands date row to show income/expense type', async () => {
-      renderWithProviders(<StrategicViewPage />);
-
-      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
-      await userEvent.click(screen.getByText('Alimentação'));
-      await waitFor(() => expect(screen.getByText('Mercado')).toBeInTheDocument());
-      await userEvent.click(screen.getByText('Mercado'));
-      await waitFor(() => expect(screen.getByText('17/07/2026')).toBeInTheDocument());
-      await userEvent.click(screen.getByText('17/07/2026'));
-
       await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
+      await userEvent.click(screen.getByText('Despesa'));
+      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
+      await userEvent.click(screen.getByText('Alimentação'));
+      await waitFor(() => expect(screen.getByText('Mercado')).toBeInTheDocument());
+      await userEvent.click(screen.getByText('Mercado'));
+
+      await waitFor(() => expect(screen.getByText('17/07/2026')).toBeInTheDocument());
     });
 
     it('filters by "apenas efetivado" hiding non-settled transactions', async () => {
       renderWithProviders(<StrategicViewPage />);
 
-      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
 
       const checkbox = screen.getByRole('checkbox', { name: /apenas efetivado/i });
       await userEvent.click(checkbox);
 
-      await waitFor(() => expect(screen.queryByText('Alimentação')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText('Despesa')).not.toBeInTheDocument());
     });
 
     it('grand total updates when apenas efetivado is applied', async () => {
@@ -136,7 +136,7 @@ describe('StrategicViewPage', () => {
     it('filters by category using multi-select', async () => {
       renderWithProviders(<StrategicViewPage />);
 
-      await waitFor(() => expect(screen.getByText('Alimentação')).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText('Despesa')).toBeInTheDocument());
 
       const catButton = screen.getByRole('button', { name: /filtrar por categorias/i });
       await userEvent.click(catButton);
@@ -146,14 +146,14 @@ describe('StrategicViewPage', () => {
 
       const table = screen.getByText('Categoria / Item').closest('.rounded-2xl') as HTMLElement;
 
-      await waitFor(() => expect(within(table).queryByText('Alimentação')).not.toBeInTheDocument());
-      expect(within(table).getByText('Renda')).toBeInTheDocument();
+      await waitFor(() => expect(within(table).queryByText('Despesa')).not.toBeInTheDocument());
+      expect(within(table).getByText('Receita')).toBeInTheDocument();
     });
 
     it('filters by item using multi-select', async () => {
       renderWithProviders(<StrategicViewPage />);
 
-      await waitFor(() => expect(screen.getByText('Renda')).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText('Receita')).toBeInTheDocument());
 
       const itemButton = screen.getByRole('button', { name: /filtrar por itens/i });
       await userEvent.click(itemButton);
@@ -161,8 +161,8 @@ describe('StrategicViewPage', () => {
       const itemCheckbox = screen.getByRole('checkbox', { name: 'Mercado' });
       await userEvent.click(itemCheckbox);
 
-      await waitFor(() => expect(screen.queryByText('Renda')).not.toBeInTheDocument());
-      expect(screen.getByText('Alimentação')).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByText('Receita')).not.toBeInTheDocument());
+      expect(screen.getByText('Despesa')).toBeInTheDocument();
     });
 
     it('date range inputs are pre-filled with current month', async () => {

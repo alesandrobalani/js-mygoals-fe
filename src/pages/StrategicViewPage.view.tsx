@@ -81,7 +81,7 @@ interface StrategicViewViewProps {
   selectedItems: string[];
   allCategories: string[];
   allItems: string[];
-  categories: CategoryEntry[];
+  types: TypeEntry[];
   grandTotal: number;
   expandedPaths: Set<string>;
   formatCurrency: (value: number) => string;
@@ -138,22 +138,51 @@ function TreeRow({ label, total, depth, path, hasChildren, expanded, formatCurre
   );
 }
 
-function TypeRows({ types, depth, formatCurrency }: { types: TypeEntry[]; depth: number; formatCurrency: (v: number) => string }) {
+function CategoryRow({
+  categories,
+  parentPath,
+  depth,
+  expandedPaths,
+  formatCurrency,
+  onTogglePath,
+}: {
+  categories: CategoryEntry[];
+  parentPath: string;
+  depth: number;
+  expandedPaths: Set<string>;
+  formatCurrency: (v: number) => string;
+  onTogglePath: (path: string) => void;
+}) {
   return (
     <>
-      {types.map((t) => (
-        <TreeRow
-          key={t.type}
-          label={t.label}
-          total={t.total}
-          depth={depth}
-          path=""
-          hasChildren={false}
-          expanded={false}
-          formatCurrency={formatCurrency}
-          onToggle={() => {}}
-        />
-      ))}
+      {categories.map((category) => {
+        const path = `${parentPath}/${category.name}`;
+        const expanded = expandedPaths.has(path);
+        return (
+          <div key={category.name}>
+            <TreeRow
+              label={category.name}
+              total={category.total}
+              depth={depth}
+              path={path}
+              hasChildren={category.items.length > 0}
+              expanded={expanded}
+              formatCurrency={formatCurrency}
+              onToggle={onTogglePath}
+            />
+            {expanded && (
+              <ItemRows
+                items={category.items}
+                parentPath={path}
+                depth={depth + 1}
+                expandedPaths={expandedPaths}
+                formatCurrency={formatCurrency}
+                onTogglePath={onTogglePath}
+              />
+            )}
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -162,7 +191,6 @@ function DateRows({
   dates,
   parentPath,
   depth,
-  expandedPaths,
   formatCurrency,
   onTogglePath,
 }: {
@@ -177,7 +205,6 @@ function DateRows({
     <>
       {dates.map((d) => {
         const path = `${parentPath}/${d.date}`;
-        const expanded = expandedPaths.has(path);
         return (
           <div key={d.date}>
             <TreeRow
@@ -185,12 +212,11 @@ function DateRows({
               total={d.total}
               depth={depth}
               path={path}
-              hasChildren={d.types.length > 0}
-              expanded={expanded}
+              hasChildren={false}
+              expanded={false}
               formatCurrency={formatCurrency}
               onToggle={onTogglePath}
-            />
-            {expanded && <TypeRows types={d.types} depth={depth + 1} formatCurrency={formatCurrency} />}
+            />            
           </div>
         );
       })}
@@ -257,7 +283,7 @@ export function StrategicViewView({
   selectedItems,
   allCategories,
   allItems,
-  categories,
+  types,
   grandTotal,
   expandedPaths,
   formatCurrency,
@@ -345,32 +371,32 @@ export function StrategicViewView({
           </p>
         )}
 
-        {!loading && !error && categories.length === 0 && (
+        {!loading && !error && types.length === 0 && (
           <p className="text-center py-8 text-sm text-slate-400">
             Nenhuma transação encontrada para o período.
           </p>
         )}
 
-        {!loading && !error && categories.length > 0 && (
+        {!loading && !error && types.length > 0 && (
           <>
-            {categories.map((category) => {
-              const path = category.name;
+            {types.map((type) => {
+              const path = type.label;
               const expanded = expandedPaths.has(path);
               return (
-                <div key={category.name}>
+                <div key={type.label}>
                   <TreeRow
-                    label={category.name}
-                    total={category.total}
+                    label={type.label}
+                    total={type.total}
                     depth={0}
                     path={path}
-                    hasChildren={category.items.length > 0}
+                    hasChildren={type.categories.length > 0}
                     expanded={expanded}
                     formatCurrency={formatCurrency}
                     onToggle={onTogglePath}
                   />
                   {expanded && (
-                    <ItemRows
-                      items={category.items}
+                    <CategoryRow
+                      categories={type.categories}
                       parentPath={path}
                       depth={1}
                       expandedPaths={expandedPaths}

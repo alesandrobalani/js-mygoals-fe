@@ -184,8 +184,8 @@ export const strategicViewTransactions: StrategicViewTransaction[] = [
   {
     amount: 800,
     type: TransactionType.EXPENSE,
-    categoryName: 'Alimentação',
-    itemName: 'Compras gerais',
+    categoryName: 'Cuidados pessoais',
+    itemName: 'Roupas',
     transactionDate: '2026-07-10T00:00:00.000Z',
     dueDate: '2026-07-10T00:00:00.000Z',
     settled: false,

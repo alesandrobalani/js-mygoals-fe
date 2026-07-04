@@ -14,38 +14,44 @@ function formatDate(dateStr: string): string {
   return `${day}/${month}/${year}`;
 }
 
-export type TypeEntry = { type: string; label: string; total: number };
-export type DateEntry = { date: string; displayDate: string; total: number; types: TypeEntry[] };
-export type ItemEntry = { name: string; total: number; dates: DateEntry[] };
+export type TypeEntry = { type: string; label: string; total: number; categories: CategoryEntry[] };
 export type CategoryEntry = { name: string; total: number; items: ItemEntry[] };
+export type ItemEntry = { name: string; total: number; dates: DateEntry[] };
+export type DateEntry = { date: string; displayDate: string; total: number };
 
 export function buildTreeData(transactions: StrategicViewTransaction[]): {
-  categories: CategoryEntry[];
+  types: TypeEntry[];
   grandTotal: number;
 } {
-  const categoryMap = new Map<
+  const typeMap = new Map<
     string,
     {
       total: number;
-      items: Map<
+      categories: Map<
           string,
             {
               total: number;
-              dates: Map<string, { total: number; types: Map<string, number> }>;
+              items: Map<string, { total: number; dates: Map<string, { total: number }> }>;
             }
           >;
     }
   >();
 
-  for (const tx of transactions) {
+  for (const tx of transactions.sort((a, b) => b.amount - a.amount)) {
     const sign = tx.type === TransactionType.INCOME ? 1 : -1;
     const value = sign * tx.amount;
     const dueDateStr = tx.dueDate.split('T')[0];
 
-    if (!categoryMap.has(tx.categoryName)) {
-      categoryMap.set(tx.categoryName, { total: 0, items: new Map() });
+    if (!typeMap.has(tx.type)) {
+      typeMap.set(tx.type, { total: 0, categories: new Map() });
     }
-    const category = categoryMap.get(tx.categoryName)!;
+    const type = typeMap.get(tx.type)!;
+    type.total += value;
+
+    if (!type.categories.has(tx.categoryName)) {
+      type.categories.set(tx.categoryName, { total: 0, items: new Map() });
+    }
+    const category = type.categories.get(tx.categoryName)!;
     category.total += value;
 
     if (!category.items.has(tx.itemName)) {
@@ -55,42 +61,41 @@ export function buildTreeData(transactions: StrategicViewTransaction[]): {
     item.total += value;
 
     if (!item.dates.has(dueDateStr)) {
-      item.dates.set(dueDateStr, { total: 0, types: new Map() });
+      item.dates.set(dueDateStr, {total: 0});
     }
     const dateEntry = item.dates.get(dueDateStr)!;
     dateEntry.total += value;
-    dateEntry.types.set(tx.type, (dateEntry.types.get(tx.type) ?? 0) + value);
   }
 
-  const categories: CategoryEntry[] = [];
+  const types: TypeEntry[] = [];
   let grandTotal = 0;
 
-  for (const [categoryName, categoryData] of categoryMap) {
-    grandTotal += categoryData.total;
-    const items: ItemEntry[] = [];
+  for (const [typeLabel, typeData] of typeMap) {
+    grandTotal += typeData.total;
+    const categories: CategoryEntry[] = [];
 
-    for (const [itemName, itemData] of categoryData.items) {
-      const dates: DateEntry[] = [];
+    for (const [categoryName, categoryData] of typeData.categories) {
+      const items: ItemEntry[] = [];
 
-      for (const [dateStr, dateData] of itemData.dates) {
-        const types: TypeEntry[] = [];
-        for (const [typeKey, typeTotal] of dateData.types) {
-          types.push({
-            type: typeKey,
-            label: typeKey === TransactionType.INCOME ? 'Receita' : 'Despesa',
-            total: typeTotal,
+      for (const [itemName, itemData] of categoryData.items) {
+        const dates: DateEntry[] = [];
+        for (const [dueDateStr, dateData] of itemData.dates) {
+          dates.push({
+            date: dueDateStr,            
+            displayDate: formatDate(dueDateStr),
+            total: dateData.total
           });
         }
-        dates.push({ date: dateStr, displayDate: formatDate(dateStr), total: dateData.total, types });
+        items.push({ name: itemName, total: itemData.total, dates });
       }
 
-      items.push({ name: itemName, total: itemData.total, dates });
+      categories.push({ name: categoryName, total: categoryData.total, items });
     }
 
-    categories.push({ name: categoryName, total: categoryData.total, items });
+    types.push({ type: typeLabel, label: typeLabel === TransactionType.INCOME ? 'Receita' : 'Despesa', total: typeData.total, categories });
   }
 
-  return { categories, grandTotal };
+  return { types, grandTotal };
 }
 
 export function StrategicViewPage() {
@@ -136,7 +141,7 @@ export function StrategicViewPage() {
     });
   }, [transactions, onlySettled, selectedCategories, selectedItems]);
 
-  const { categories, grandTotal } = useMemo(
+  const { types, grandTotal } = useMemo(
     () => buildTreeData(filteredTransactions),
     [filteredTransactions],
   );
@@ -180,7 +185,7 @@ export function StrategicViewPage() {
       selectedItems={selectedItems}
       allCategories={allCategories}
       allItems={allItems}
-      categories={categories}
+      types={types}
       grandTotal={grandTotal}
       expandedPaths={expandedPaths}
       formatCurrency={formatCurrency}
