@@ -18,29 +18,22 @@ export type TypeEntry = { type: string; label: string; total: number };
 export type DateEntry = { date: string; displayDate: string; total: number; types: TypeEntry[] };
 export type ItemEntry = { name: string; total: number; dates: DateEntry[] };
 export type CategoryEntry = { name: string; total: number; items: ItemEntry[] };
-export type AccountEntry = { name: string; total: number; categories: CategoryEntry[] };
 
 export function buildTreeData(transactions: StrategicViewTransaction[]): {
-  accounts: AccountEntry[];
+  categories: CategoryEntry[];
   grandTotal: number;
 } {
-  const accountMap = new Map<
+  const categoryMap = new Map<
     string,
     {
       total: number;
-      categories: Map<
-        string,
-        {
-          total: number;
-          items: Map<
-            string,
+      items: Map<
+          string,
             {
               total: number;
               dates: Map<string, { total: number; types: Map<string, number> }>;
             }
           >;
-        }
-      >;
     }
   >();
 
@@ -49,16 +42,10 @@ export function buildTreeData(transactions: StrategicViewTransaction[]): {
     const value = sign * tx.amount;
     const dueDateStr = tx.dueDate.split('T')[0];
 
-    if (!accountMap.has(tx.accountName)) {
-      accountMap.set(tx.accountName, { total: 0, categories: new Map() });
+    if (!categoryMap.has(tx.categoryName)) {
+      categoryMap.set(tx.categoryName, { total: 0, items: new Map() });
     }
-    const account = accountMap.get(tx.accountName)!;
-    account.total += value;
-
-    if (!account.categories.has(tx.categoryName)) {
-      account.categories.set(tx.categoryName, { total: 0, items: new Map() });
-    }
-    const category = account.categories.get(tx.categoryName)!;
+    const category = categoryMap.get(tx.categoryName)!;
     category.total += value;
 
     if (!category.items.has(tx.itemName)) {
@@ -75,41 +62,35 @@ export function buildTreeData(transactions: StrategicViewTransaction[]): {
     dateEntry.types.set(tx.type, (dateEntry.types.get(tx.type) ?? 0) + value);
   }
 
-  const accounts: AccountEntry[] = [];
+  const categories: CategoryEntry[] = [];
   let grandTotal = 0;
 
-  for (const [accountName, accountData] of accountMap) {
-    grandTotal += accountData.total;
-    const categories: CategoryEntry[] = [];
+  for (const [categoryName, categoryData] of categoryMap) {
+    grandTotal += categoryData.total;
+    const items: ItemEntry[] = [];
 
-    for (const [catName, catData] of accountData.categories) {
-      const items: ItemEntry[] = [];
+    for (const [itemName, itemData] of categoryData.items) {
+      const dates: DateEntry[] = [];
 
-      for (const [itemName, itemData] of catData.items) {
-        const dates: DateEntry[] = [];
-
-        for (const [dateStr, dateData] of itemData.dates) {
-          const types: TypeEntry[] = [];
-          for (const [typeKey, typeTotal] of dateData.types) {
-            types.push({
-              type: typeKey,
-              label: typeKey === TransactionType.INCOME ? 'Receita' : 'Despesa',
-              total: typeTotal,
-            });
-          }
-          dates.push({ date: dateStr, displayDate: formatDate(dateStr), total: dateData.total, types });
+      for (const [dateStr, dateData] of itemData.dates) {
+        const types: TypeEntry[] = [];
+        for (const [typeKey, typeTotal] of dateData.types) {
+          types.push({
+            type: typeKey,
+            label: typeKey === TransactionType.INCOME ? 'Receita' : 'Despesa',
+            total: typeTotal,
+          });
         }
-
-        items.push({ name: itemName, total: itemData.total, dates });
+        dates.push({ date: dateStr, displayDate: formatDate(dateStr), total: dateData.total, types });
       }
 
-      categories.push({ name: catName, total: catData.total, items });
+      items.push({ name: itemName, total: itemData.total, dates });
     }
 
-    accounts.push({ name: accountName, total: accountData.total, categories });
+    categories.push({ name: categoryName, total: categoryData.total, items });
   }
 
-  return { accounts, grandTotal };
+  return { categories, grandTotal };
 }
 
 export function StrategicViewPage() {
@@ -155,7 +136,7 @@ export function StrategicViewPage() {
     });
   }, [transactions, onlySettled, selectedCategories, selectedItems]);
 
-  const { accounts, grandTotal } = useMemo(
+  const { categories, grandTotal } = useMemo(
     () => buildTreeData(filteredTransactions),
     [filteredTransactions],
   );
@@ -199,7 +180,7 @@ export function StrategicViewPage() {
       selectedItems={selectedItems}
       allCategories={allCategories}
       allItems={allItems}
-      accounts={accounts}
+      categories={categories}
       grandTotal={grandTotal}
       expandedPaths={expandedPaths}
       formatCurrency={formatCurrency}
