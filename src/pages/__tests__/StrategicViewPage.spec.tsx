@@ -6,7 +6,6 @@ import { StrategicViewPage } from '../StrategicViewPage';
 import { renderWithProviders } from '../../test/render-helpers';
 import { server } from '../../test/mocks/server';
 import { strategicViewTransactions } from '../../test/mocks/fixtures';
-import { buildTreeData } from '../StrategicViewPage';
 
 const fmt = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v).replace(/\s/g, ' ').trim();

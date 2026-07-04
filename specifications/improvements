@@ -4,3 +4,4 @@
 - Criar a visão efetiva e estimada das contas
 - Passar a visão de contas para a parte lateral da visão das transações e visão estratégica. Não apresentar contas com valores zerados.
 - Ajustar a visão estratégica para não apresentar contas.
+- Não perder o filtro ao editar ou criar uma transação.
