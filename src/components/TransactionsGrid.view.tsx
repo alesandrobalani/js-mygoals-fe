@@ -2,20 +2,16 @@ import type { Transaction } from '../types';
 import { TransactionType } from '../types';
 
 
-const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
-
 interface TransactionsGridViewProps {
   transactions: Transaction[];
   total: number;
   page: number;
   totalPages: number;
-  limit: number;
   loading: boolean;
   error: string;
   filterText: string;
   onFilterChange: (text: string) => void;
   onPageChange: (page: number) => void;
-  onLimitChange: (limit: number) => void;
   onEditTransaction: (tx: Transaction) => void;
   onRemoveTransaction: (tx: Transaction) => void;
 }
@@ -28,13 +24,11 @@ export function TransactionsGridView({
   transactions,
   page,
   totalPages,
-  limit,
   loading,
   error,
   filterText,
   onFilterChange,
   onPageChange,
-  onLimitChange,
   onEditTransaction,
   onRemoveTransaction,
 }: TransactionsGridViewProps) {
@@ -178,23 +172,6 @@ export function TransactionsGridView({
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
-        <div className="flex items-center gap-2">
-          <span>Registros por página:</span>
-          {PAGE_SIZE_OPTIONS.map((size) => (
-            <button
-              key={size}
-              onClick={() => onLimitChange(size)}
-              className={`px-2 py-1 rounded ${
-                limit === size
-                  ? 'bg-sky-600 text-white font-medium'
-                  : 'hover:bg-slate-100 text-slate-600'
-              }`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
-
         <div className="flex items-center gap-3">
           <button
             onClick={() => onPageChange(page - 1)}
