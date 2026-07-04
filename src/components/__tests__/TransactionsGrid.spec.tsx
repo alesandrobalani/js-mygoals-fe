@@ -106,15 +106,6 @@ describe('TransactionsGrid', () => {
       );
     });
 
-    it('changes page size when limit button is clicked', async () => {
-      renderWithProviders(<TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} />);
-
-      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
-
-      await userEvent.click(screen.getByRole('button', { name: '50' }));
-
-      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
-    });
   });
 
   describe('filter', () => {

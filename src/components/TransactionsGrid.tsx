@@ -5,6 +5,8 @@ import { transactionsService } from '../services/transactions.service';
 import { TransactionsGridView, formatCurrency } from './TransactionsGrid.view';
 import { ConfirmDialog } from './ConfirmDialog';
 
+const LIMIT_ROWS = 100;
+
 export function TransactionsGrid({
   refreshKey = 0,
   startDate,
@@ -22,7 +24,6 @@ export function TransactionsGrid({
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterText, setFilterText] = useState('');
@@ -60,7 +61,7 @@ export function TransactionsGrid({
     setLoading(true);
     setError('');
     transactionsService
-      .search(startDate, endDate, page, limit)
+      .search(startDate, endDate, page, LIMIT_ROWS)
       .then((result) => {
         setTransactions(result.data);
         setTotal(result.total);
@@ -68,12 +69,8 @@ export function TransactionsGrid({
       })
       .catch(() => setError('Erro ao carregar transações.'))
       .finally(() => setLoading(false));
-  }, [startDate, endDate, page, limit, refreshKey, deleteKey]);
+  }, [startDate, endDate, page, LIMIT_ROWS, refreshKey, deleteKey]);
 
-  function handleLimitChange(newLimit: number) {
-    setLimit(newLimit);
-    setPage(1);
-  }
 
   async function handleConfirmRemove() {
     if (!transactionToRemove) return;
@@ -98,13 +95,11 @@ export function TransactionsGrid({
         total={total}
         page={page}
         totalPages={totalPages}
-        limit={limit}
         loading={loading}
         error={removeError || error}
         filterText={filterText}
         onFilterChange={setFilterText}
         onPageChange={setPage}
-        onLimitChange={handleLimitChange}
         onEditTransaction={onEditTransaction}
         onRemoveTransaction={setTransactionToRemove}
       />
