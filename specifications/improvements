@@ -1,7 +1,6 @@
-- Criar estrutura de filtro para o GRID.
-- Adicionar opção de remoção com confirmação da transação.
-- Editar transações
 - Melhorar a usabilidade do cadastro de transação para ser mais rápido e conseguir usar apenas o teclado
 - Ajustar o nome da aplicação na aba do browser
 - Criar a importação de arquivos das faturas de cartão de créditos
 - Criar a visão efetiva e estimada das contas
+- Passar a visão de contas para a parte lateral da visão das transações e visão estratégica. Não apresentar contas com valores zerados.
+- Ajustar a visão estratégica para não apresentar contas.

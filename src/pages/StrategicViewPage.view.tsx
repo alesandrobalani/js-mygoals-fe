@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { AccountEntry, CategoryEntry, DateEntry, ItemEntry, TypeEntry } from './StrategicViewPage';
+import type { CategoryEntry, DateEntry, ItemEntry, TypeEntry } from './StrategicViewPage';
 
 interface MultiSelectProps {
   label: string;
@@ -81,7 +81,7 @@ interface StrategicViewViewProps {
   selectedItems: string[];
   allCategories: string[];
   allItems: string[];
-  accounts: AccountEntry[];
+  categories: CategoryEntry[];
   grandTotal: number;
   expandedPaths: Set<string>;
   formatCurrency: (value: number) => string;
@@ -247,55 +247,6 @@ function ItemRows({
   );
 }
 
-function CategoryRows({
-  categories,
-  parentPath,
-  depth,
-  expandedPaths,
-  formatCurrency,
-  onTogglePath,
-}: {
-  categories: CategoryEntry[];
-  parentPath: string;
-  depth: number;
-  expandedPaths: Set<string>;
-  formatCurrency: (v: number) => string;
-  onTogglePath: (path: string) => void;
-}) {
-  return (
-    <>
-      {categories.map((cat) => {
-        const path = `${parentPath}/${cat.name}`;
-        const expanded = expandedPaths.has(path);
-        return (
-          <div key={cat.name}>
-            <TreeRow
-              label={cat.name}
-              total={cat.total}
-              depth={depth}
-              path={path}
-              hasChildren={cat.items.length > 0}
-              expanded={expanded}
-              formatCurrency={formatCurrency}
-              onToggle={onTogglePath}
-            />
-            {expanded && (
-              <ItemRows
-                items={cat.items}
-                parentPath={path}
-                depth={depth + 1}
-                expandedPaths={expandedPaths}
-                formatCurrency={formatCurrency}
-                onTogglePath={onTogglePath}
-              />
-            )}
-          </div>
-        );
-      })}
-    </>
-  );
-}
-
 export function StrategicViewView({
   loading,
   error,
@@ -306,7 +257,7 @@ export function StrategicViewView({
   selectedItems,
   allCategories,
   allItems,
-  accounts,
+  categories,
   grandTotal,
   expandedPaths,
   formatCurrency,
@@ -378,7 +329,7 @@ export function StrategicViewView({
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         {/* Cabeçalho */}
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Conta / Categoria / Item</span>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Categoria / Item</span>
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total</span>
         </div>
 
@@ -394,32 +345,32 @@ export function StrategicViewView({
           </p>
         )}
 
-        {!loading && !error && accounts.length === 0 && (
+        {!loading && !error && categories.length === 0 && (
           <p className="text-center py-8 text-sm text-slate-400">
             Nenhuma transação encontrada para o período.
           </p>
         )}
 
-        {!loading && !error && accounts.length > 0 && (
+        {!loading && !error && categories.length > 0 && (
           <>
-            {accounts.map((account) => {
-              const path = account.name;
+            {categories.map((category) => {
+              const path = category.name;
               const expanded = expandedPaths.has(path);
               return (
-                <div key={account.name}>
+                <div key={category.name}>
                   <TreeRow
-                    label={account.name}
-                    total={account.total}
+                    label={category.name}
+                    total={category.total}
                     depth={0}
                     path={path}
-                    hasChildren={account.categories.length > 0}
+                    hasChildren={category.items.length > 0}
                     expanded={expanded}
                     formatCurrency={formatCurrency}
                     onToggle={onTogglePath}
                   />
                   {expanded && (
-                    <CategoryRows
-                      categories={account.categories}
+                    <ItemRows
+                      items={category.items}
                       parentPath={path}
                       depth={1}
                       expandedPaths={expandedPaths}
