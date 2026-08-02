@@ -16,8 +16,8 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Rotas protegidas por JWT
 - Layout responsivo para Web desktop e Mobile Android
 - **Dashboard de Transações** (`/dashboard`): cards de saldo, receitas e despesas com navegação por mês (anterior/próximo e seleção direta de mês/ano)
-- **Dashboard de Contas** (`/contas`): saldo efetivado e estimado por conta com navegação por mês (anterior/próximo e seleção direta de mês/ano)
 - Grid de transações do mês selecionado com paginação (20 / 50 / 100 registros por página)
+- Painel de contas ao lado do grid de transações: nome da conta e saldos efetivado/estimado até a data fim do mês selecionado, ordenado pela maior quantidade de transações no período e ocultando contas sem valores efetivado e estimado
 - Criação e edição de transações via modal no dashboard (com atualização automática do grid e resumo)
 - Remoção de transação com confirmação (atualiza grid e resumo após exclusão)
 - Criação rápida de categoria, conta e item inline no modal de transação
@@ -80,8 +80,8 @@ npm run preview
 ```
 src/
   contexts/     # AuthContext (estado de autenticação global)
-  components/   # Layout, ProtectedRoute, TransactionsGrid, MonthNavigator
-  pages/        # LoginPage, DashboardPage, AccountsDashboardPage, UsersPage, CreateUserPage
+  components/   # Layout, ProtectedRoute, TransactionsGrid, AccountsPanel, MonthNavigator
+  pages/        # LoginPage, DashboardPage, UsersPage, CreateUserPage
   services/     # api.ts (axios), auth.service.ts, users.service.ts, transactions.service.ts, accounts.service.ts
   utils/        # date.ts (getMonthRange)
   types/        # Tipagens compartilhadas
@@ -89,9 +89,9 @@ src/
 
 ## Navegação por mês
 
-Ambos os dashboards (Transações e Contas) abrem no mês corrente automaticamente. Para trocar a competência:
+O Dashboard de Transações abre no mês corrente automaticamente. Para trocar a competência:
 
 - **`←` / `→`** — navega um mês para trás ou para frente
 - **Clique no rótulo do mês** (ex.: "Maio 2026") — abre um seletor nativo de mês/ano para ir direto a qualquer período
 
-No Dashboard de Transações, todos os cards de resumo e a grade de transações são atualizados ao mudar o mês. No Dashboard de Contas, os saldos efetivado e estimado de cada conta são atualizados para o mês selecionado.
+Ao mudar o mês, os cards de resumo, a grade de transações e o painel de contas ao lado são atualizados. O painel de contas usa a data fim do mês selecionado como referência para os saldos efetivado e estimado, e a quantidade de transações no período (intervalo do mês) para ordenar as contas.

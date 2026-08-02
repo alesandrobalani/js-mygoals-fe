@@ -1,0 +1,8 @@
+Quero remover o dash de conta.
+Quero que os dados de conta sejam apresentados em um painel dentro do dash de transações ao lado do grid de transações.
+O período de filtro da conta deve ser a data fim do dash de transações, o backend não deve ser alterado.
+Deverão ser apresentados o nome da conta e os valores estimados e efetivados de cada conta.
+As contas que tenham valor zerado tanto no efetivado como no estimado não devem ser apresentadas.
+As contas devem ser apresentadas na ordem da maior quantidade de transações no período.
+Os testes devem ser ajustados para o novo comportamento.
+A documentação deve ser atualizada do projeto.
