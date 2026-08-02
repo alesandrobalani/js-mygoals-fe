@@ -4,6 +4,7 @@ import type { Transaction } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
 import { TransactionsGrid } from '../components/TransactionsGrid';
+import { AccountsPanel } from '../components/AccountsPanel';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { getMonthRange } from '../utils/date';
 
@@ -108,13 +109,24 @@ export function DashboardPage() {
         onNextMonth={handleNextMonth}
         onMonthChange={handleMonthChange}
       />
-      <TransactionsGrid
-        refreshKey={refreshKey}
-        startDate={startDate}
-        endDate={endDate}
-        onEditTransaction={handleEditTransaction}
-        onDeleteSuccess={() => setRefreshKey((k) => k + 1)}
-      />
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        <div className="flex-1 min-w-0">
+          <TransactionsGrid
+            refreshKey={refreshKey}
+            startDate={startDate}
+            endDate={endDate}
+            onEditTransaction={handleEditTransaction}
+            onDeleteSuccess={() => setRefreshKey((k) => k + 1)}
+          />
+        </div>
+        <div className="w-full lg:w-80 shrink-0">
+          <AccountsPanel
+            refreshKey={refreshKey}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        </div>
+      </div>
       {isModalOpen && (
         <CreateTransactionModal
           onClose={() => setIsModalOpen(false)}

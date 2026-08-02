@@ -62,7 +62,8 @@ export function TransactionsGridView({
             Nenhuma transação no período.
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[960px] text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
@@ -168,6 +169,7 @@ export function TransactionsGridView({
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

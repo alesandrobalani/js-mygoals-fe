@@ -18,7 +18,6 @@ export function Layout() {
       ? [{ to: '/users', label: 'Usuários' }]
       : [
           { to: '/dashboard', label: 'Transações' },
-          { to: '/contas', label: 'Contas' },
           { to: '/visao-estrategica', label: 'Visão Estratégica' },
         ];
 
