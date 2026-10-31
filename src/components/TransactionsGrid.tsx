@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Transaction } from '../types';
 import { TransactionType } from '../types';
 import { transactionsService } from '../services/transactions.service';
-import { TransactionsGridView, formatCurrency } from './TransactionsGrid.view';
+import { useAsync } from '../hooks/useAsync';
+import { TransactionsGridView } from './TransactionsGrid.view';
+import { formatCurrency } from '../utils/format';
 import { ConfirmDialog } from './ConfirmDialog';
 
 const LIMIT_ROWS = 100;
+/** Referência estável para não invalidar o useMemo a cada render. */
+const NO_TRANSACTIONS: Transaction[] = [];
 
 export function TransactionsGrid({
   refreshKey = 0,
@@ -20,17 +24,30 @@ export function TransactionsGrid({
   onEditTransaction: (tx: Transaction) => void;
   onDeleteSuccess?: () => void;
 }) {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [filterText, setFilterText] = useState('');
+  const [period, setPeriod] = useState({ startDate, endDate });
   const [deleteKey, setDeleteKey] = useState(0);
   const [transactionToRemove, setTransactionToRemove] = useState<Transaction | null>(null);
   const [removing, setRemoving] = useState(false);
   const [removeError, setRemoveError] = useState('');
+
+  // Mudou o período: volta para a página 1 e limpa o filtro.
+  // Ajuste de estado durante o render (padrão recomendado pelo React), sem efeito extra.
+  if (period.startDate !== startDate || period.endDate !== endDate) {
+    setPeriod({ startDate, endDate });
+    setPage(1);
+    setFilterText('');
+  }
+
+  const { data: result, loading, error: loadError } = useAsync(
+    () => transactionsService.search(startDate, endDate, page, LIMIT_ROWS),
+    [startDate, endDate, page, refreshKey, deleteKey],
+  );
+  const transactions = result?.data ?? NO_TRANSACTIONS;
+  const total = result?.total ?? 0;
+  const totalPages = result?.totalPages ?? 1;
+  const error = loadError ? 'Erro ao carregar transações.' : '';
 
   const filteredTransactions = useMemo(() => {
     if (!filterText) return transactions;
@@ -51,26 +68,6 @@ export function TransactionsGrid({
       );
     });
   }, [transactions, filterText]);
-
-  useEffect(() => {
-    setPage(1);
-    setFilterText('');
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    transactionsService
-      .search(startDate, endDate, page, LIMIT_ROWS)
-      .then((result) => {
-        setTransactions(result.data);
-        setTotal(result.total);
-        setTotalPages(result.totalPages);
-      })
-      .catch(() => setError('Erro ao carregar transações.'))
-      .finally(() => setLoading(false));
-  }, [startDate, endDate, page, LIMIT_ROWS, refreshKey, deleteKey]);
-
 
   async function handleConfirmRemove() {
     if (!transactionToRemove) return;

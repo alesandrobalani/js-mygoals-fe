@@ -79,11 +79,12 @@ npm run preview
 
 ```
 src/
-  contexts/     # AuthContext (estado de autenticação global)
+  contexts/     # AuthContext/AuthProvider + useAuth (estado de autenticação global)
+  hooks/        # useAsync (carregamento de dados com loading/erro)
   components/   # Layout, ProtectedRoute, TransactionsGrid, AccountsPanel, MonthNavigator
   pages/        # LoginPage, DashboardPage, UsersPage, CreateUserPage
   services/     # api.ts (axios), auth.service.ts, users.service.ts, transactions.service.ts, accounts.service.ts
-  utils/        # date.ts (getMonthRange)
+  utils/        # date.ts (getMonthRange), format.ts (formatCurrency), strategic-tree.ts (árvore da visão estratégica)
   types/        # Tipagens compartilhadas
 ```
 

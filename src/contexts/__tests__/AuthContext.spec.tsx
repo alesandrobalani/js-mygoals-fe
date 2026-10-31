@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { AuthProvider, useAuth } from '../AuthContext';
+import { AuthProvider } from '../AuthContext';
+import { useAuth } from '../useAuth';
 import { server } from '../../test/mocks/server';
 
 function wrapper({ children }: { children: React.ReactNode }) {

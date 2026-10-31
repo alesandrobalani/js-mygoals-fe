@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
+import { useAsync } from '../hooks/useAsync';
+import { useAuth } from '../contexts/useAuth';
 import type { Transaction } from '../types';
 import { transactionsService } from '../services/transactions.service';
 import { DashboardView } from './DashboardPage.view';
@@ -7,41 +8,25 @@ import { TransactionsGrid } from '../components/TransactionsGrid';
 import { AccountsPanel } from '../components/AccountsPanel';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { getMonthRange } from '../utils/date';
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-}
+import { formatCurrency } from '../utils/format';
 
 export function DashboardPage() {
   const { user } = useAuth();
   const now = new Date();
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
-  const [incomeSettled, setIncomeSettled] = useState(0);
-  const [incomeNotSettled, setIncomeNotSettled] = useState(0);
-  const [expenseSettled, setExpenseSettled] = useState(0);
-  const [expenseNotSettled, setExpenseNotSettled] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const { startDate, endDate } = getMonthRange(selectedYear, selectedMonth);
 
-  useEffect(() => {
-    setLoading(true);
-    transactionsService
-      .getSummary(startDate, endDate)
-      .then((summary) => {
-        setIncomeSettled(summary.incomeSettled);
-        setIncomeNotSettled(summary.incomeNotSettled);
-        setExpenseSettled(summary.expenseSettled);
-        setExpenseNotSettled(summary.expenseNotSettled);
-      })
-      .catch(() => setError('Erro ao carregar resumo financeiro.'))
-      .finally(() => setLoading(false));
-  }, [startDate, endDate, refreshKey]);
+  const { data: summary, loading, error: loadError } = useAsync(
+    () => transactionsService.getSummary(startDate, endDate),
+    [startDate, endDate, refreshKey],
+  );
+  const { incomeSettled = 0, incomeNotSettled = 0, expenseSettled = 0, expenseNotSettled = 0 } = summary ?? {};
+  const error = loadError ? 'Erro ao carregar resumo financeiro.' : '';
 
   function handlePrevMonth() {
     if (selectedMonth === 0) {
@@ -68,7 +53,6 @@ export function DashboardPage() {
 
   function handleTransactionCreated() {
     setRefreshKey((k) => k + 1);
-    setLoading(true);
   }
 
   function handleEditTransaction(tx: Transaction) {

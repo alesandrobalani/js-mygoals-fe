@@ -1,6 +1,6 @@
 import type { Transaction } from '../types';
 import { TransactionType } from '../types';
-
+import { formatCurrency } from '../utils/format';
 
 interface TransactionsGridViewProps {
   transactions: Transaction[];
@@ -14,10 +14,6 @@ interface TransactionsGridViewProps {
   onPageChange: (page: number) => void;
   onEditTransaction: (tx: Transaction) => void;
   onRemoveTransaction: (tx: Transaction) => void;
-}
-
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 export function TransactionsGridView({

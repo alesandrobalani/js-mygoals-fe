@@ -1,26 +1,15 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { User, LoginPayload } from '../types';
 import { authService } from '../services/auth.service';
-
-interface AuthContextValue {
-  user: User | null;
-  loading: boolean;
-  login: (payload: LoginPayload) => Promise<User>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Só há sessão a restaurar se existir token; sem token, já começa carregado.
+  const [loading, setLoading] = useState(() => localStorage.getItem('accessToken') !== null);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!localStorage.getItem('accessToken')) return;
     authService
       .getMe()
       .then((me) => setUser(me))
@@ -47,10 +36,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
 }
