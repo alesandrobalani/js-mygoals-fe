@@ -53,6 +53,8 @@ export type TransactionType = (typeof TransactionType)[keyof typeof TransactionT
 export interface TransactionCategory {
   id: string;
   name: string;
+  /** Categoria de transferência entre contas (vem do backend). */
+  isTransfer?: boolean;
 }
 
 export interface Transaction {
@@ -114,6 +116,38 @@ export interface TransactionItem {
   id: string;
   name: string;
   updatedAt: string;
+}
+
+/** Competência no formato YYYY-MM. */
+export type YearMonth = string;
+
+export interface CopyTransactionsPayload {
+  transactionIds: string[];
+  targetMonths: YearMonth[];
+  dryRun?: boolean;
+}
+
+export interface CopyTransactionsCreatedItem {
+  sourceId: string;
+  targetMonth: YearMonth;
+  description?: string;
+  amount: number;
+  type: TransactionType;
+  dueDate: string;
+  transactionDate: string;
+}
+
+export interface CopyTransactionsSkippedItem {
+  sourceId: string;
+  targetMonth: YearMonth;
+  dueDate: string;
+  reason: 'duplicate';
+}
+
+export interface CopyTransactionsResult {
+  dryRun: boolean;
+  created: CopyTransactionsCreatedItem[];
+  skipped: CopyTransactionsSkippedItem[];
 }
 
 export interface StrategicViewTransaction {

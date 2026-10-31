@@ -1,7 +1,4 @@
-const MONTH_NAMES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
-];
+import { MONTH_NAMES } from '../utils/date';
 
 interface MonthNavigatorViewProps {
   year: number;

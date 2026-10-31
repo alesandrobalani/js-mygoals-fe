@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { MemoryRouter } from 'react-router-dom';
 import { TransactionsGrid } from '../TransactionsGrid';
+import { AuthProvider } from '../../contexts/AuthContext';
 import { renderWithProviders } from '../../test/render-helpers';
 import { server } from '../../test/mocks/server';
-import { paginatedTransactions, transactionsList } from '../../test/mocks/fixtures';
+import { paginatedTransactions, transactionsList, transferTransaction } from '../../test/mocks/fixtures';
 
 const defaultProps = {
   startDate: '2026-05-01',
@@ -362,6 +364,186 @@ describe('TransactionsGrid', () => {
       await waitFor(() =>
         expect(screen.getByText('Erro ao carregar transações.')).toBeInTheDocument(),
       );
+    });
+  });
+
+  describe('selection and copy', () => {
+    const SEARCH_URL = 'http://localhost:3000/transactions/search';
+    const rowCheckbox = (description: string) => screen.getByRole('checkbox', { name: `Selecionar ${description}` });
+    const selectAll = () => screen.getByRole('checkbox', { name: 'Selecionar todos os lançamentos visíveis' });
+    const toolbar = () => screen.queryByRole('toolbar', { name: 'Ações da seleção' });
+
+    async function renderLoaded(extra: Partial<Parameters<typeof TransactionsGrid>[0]> = {}) {
+      const result = renderWithProviders(
+        <TransactionsGrid {...defaultProps} onEditTransaction={onEditTransaction} {...extra} />,
+      );
+      await waitFor(() => expect(screen.getByText(transactionsList[0].description!)).toBeInTheDocument());
+      return result;
+    }
+
+    it('renders a checkbox per row and a select-all checkbox, none checked', async () => {
+      await renderLoaded();
+
+      for (const tx of transactionsList) expect(rowCheckbox(tx.description!)).not.toBeChecked();
+      expect(selectAll()).not.toBeChecked();
+      expect(toolbar()).not.toBeInTheDocument();
+    });
+
+    it('selects a row and shows the action bar', async () => {
+      await renderLoaded();
+
+      await userEvent.click(rowCheckbox('Supermercado'));
+
+      expect(rowCheckbox('Supermercado')).toBeChecked();
+      expect(toolbar()).toHaveTextContent('1 selecionado');
+      expect(selectAll()).toBePartiallyChecked();
+    });
+
+    it('selects and unselects all visible rows', async () => {
+      await renderLoaded();
+
+      await userEvent.click(selectAll());
+      expect(toolbar()).toHaveTextContent('3 selecionados');
+      expect(selectAll()).toBeChecked();
+
+      await userEvent.click(selectAll());
+      expect(toolbar()).not.toBeInTheDocument();
+    });
+
+    it('select-all only affects rows matching the filter', async () => {
+      await renderLoaded();
+
+      await userEvent.type(screen.getByLabelText('Filtrar transações'), 'luz');
+      await userEvent.click(selectAll());
+      await userEvent.click(screen.getByRole('button', { name: 'Limpar filtro' }));
+
+      expect(toolbar()).toHaveTextContent('1 selecionado');
+      expect(rowCheckbox('Conta de luz')).toBeChecked();
+      expect(rowCheckbox('Salário')).not.toBeChecked();
+    });
+
+    it('disables transfers and ignores them in select-all', async () => {
+      server.use(
+        http.get(SEARCH_URL, () =>
+          HttpResponse.json({ ...paginatedTransactions, data: [transactionsList[0], transferTransaction], total: 2 }),
+        ),
+      );
+      await renderLoaded();
+
+      const transferBox = screen.getByRole('checkbox', {
+        name: `${transferTransaction.description}: transferências não podem ser copiadas`,
+      });
+      expect(transferBox).toBeDisabled();
+      expect(screen.getByTitle('Transferências não podem ser copiadas')).toBeInTheDocument();
+
+      await userEvent.click(selectAll());
+      expect(toolbar()).toHaveTextContent('1 selecionado');
+      expect(selectAll()).toBeChecked();
+    });
+
+    it('keeps the selection across pages', async () => {
+      server.use(
+        http.get(SEARCH_URL, ({ request }) => {
+          const page = Number(new URL(request.url).searchParams.get('page'));
+          const data = page === 1 ? [transactionsList[0], transactionsList[1]] : [transactionsList[2]];
+          return HttpResponse.json({ data, total: 3, page, limit: 2, totalPages: 2 });
+        }),
+      );
+      await renderLoaded();
+
+      await userEvent.click(rowCheckbox('Supermercado'));
+      await userEvent.click(screen.getByRole('button', { name: 'Próxima >' }));
+      await waitFor(() => expect(screen.getByText('Conta de luz')).toBeInTheDocument());
+      await userEvent.click(rowCheckbox('Conta de luz'));
+
+      expect(toolbar()).toHaveTextContent('2 selecionados');
+      await userEvent.click(screen.getByRole('button', { name: '< Anterior' }));
+      await waitFor(() => expect(rowCheckbox('Supermercado')).toBeChecked());
+    });
+
+    it('clears the selection when the period changes', async () => {
+      const { rerender } = await renderLoaded();
+      await userEvent.click(rowCheckbox('Supermercado'));
+      expect(toolbar()).toBeInTheDocument();
+
+      rerender(
+        <MemoryRouter>
+          <AuthProvider>
+            <TransactionsGrid startDate="2026-06-01" endDate="2026-06-30" onEditTransaction={onEditTransaction} />
+          </AuthProvider>
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => expect(rowCheckbox('Supermercado')).not.toBeChecked());
+      expect(toolbar()).not.toBeInTheDocument();
+    });
+
+    it('clears the selection with "Limpar seleção"', async () => {
+      await renderLoaded();
+      await userEvent.click(rowCheckbox('Supermercado'));
+
+      await userEvent.click(screen.getByRole('button', { name: 'Limpar seleção' }));
+
+      expect(toolbar()).not.toBeInTheDocument();
+      expect(rowCheckbox('Supermercado')).not.toBeChecked();
+    });
+
+    it('copies the selection, shows the success notice and notifies the parent', async () => {
+      const onCopySuccess = vi.fn();
+      await renderLoaded({ onCopySuccess });
+      await userEvent.click(rowCheckbox('Supermercado'));
+      await userEvent.click(rowCheckbox('Conta de luz'));
+
+      await userEvent.click(screen.getByRole('button', { name: 'Copiar para competências futuras' }));
+      const dialog = screen.getByRole('dialog', { name: 'Copiar para competências futuras' });
+      // período exibido é maio/2026: o primeiro mês sugerido é junho
+      expect((within(dialog).getByLabelText('Mês de destino') as HTMLInputElement).value).toBe('2026-06');
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Adicionar mês' }));
+      const confirm = await within(dialog).findByRole('button', { name: 'Criar 2 lançamentos' });
+      await waitFor(() => expect(confirm).toBeEnabled());
+      await userEvent.click(confirm);
+
+      expect(await screen.findByRole('status')).toHaveTextContent('2 lançamentos criados');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(toolbar()).not.toBeInTheDocument();
+      expect(onCopySuccess).toHaveBeenCalledTimes(1);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Fechar aviso' }));
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('mentions ignored duplicates in the success notice', async () => {
+      server.use(
+        http.post('http://localhost:3000/transactions/copy', () =>
+          HttpResponse.json({
+            dryRun: false,
+            created: [{ sourceId: 'tx-2', targetMonth: '2026-06', amount: 800, type: 'expense', dueDate: '2026-06-10', transactionDate: '2026-06-10' }],
+            skipped: [{ sourceId: 'tx-3', targetMonth: '2026-06', dueDate: '2026-06-17', reason: 'duplicate' }],
+          }),
+        ),
+      );
+      await renderLoaded();
+      await userEvent.click(rowCheckbox('Supermercado'));
+      await userEvent.click(rowCheckbox('Conta de luz'));
+      await userEvent.click(screen.getByRole('button', { name: 'Copiar para competências futuras' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Adicionar mês' }));
+      const confirm = await screen.findByRole('button', { name: 'Criar 1 lançamento' });
+      await waitFor(() => expect(confirm).toBeEnabled());
+
+      await userEvent.click(confirm);
+
+      expect(await screen.findByRole('status')).toHaveTextContent('1 lançamento criado · 1 ignorado por já existir');
+    });
+
+    it('keeps the selection when the copy modal is cancelled', async () => {
+      await renderLoaded();
+      await userEvent.click(rowCheckbox('Supermercado'));
+      await userEvent.click(screen.getByRole('button', { name: 'Copiar para competências futuras' }));
+
+      await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(toolbar()).toHaveTextContent('1 selecionado');
     });
   });
 });

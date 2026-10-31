@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
+import type { CopyTransactionsPayload } from '../../types';
 import {
   accountsList,
+  buildCopyResult,
   accountSummaryList,
   adminUser,
   authResponse,
@@ -105,5 +107,10 @@ export const handlers = [
 
   http.get(`${BASE}/transactions/strategic-view`, () => {
     return HttpResponse.json(strategicViewTransactions);
+  }),
+
+  http.post(`${BASE}/transactions/copy`, async ({ request }) => {
+    const payload = (await request.json()) as CopyTransactionsPayload;
+    return HttpResponse.json(buildCopyResult(payload));
   }),
 ];

@@ -11,6 +11,8 @@ import {
   type AccountSummary,
   type TransactionItem,
   type StrategicViewTransaction,
+  type CopyTransactionsPayload,
+  type CopyTransactionsResult,
 } from '../../types';
 
 export const adminUser: User = {
@@ -200,3 +202,42 @@ export const strategicViewTransactions: StrategicViewTransaction[] = [
     settled: false,
   },
 ];
+
+/** Lançamento de transferência (não pode ser copiado). */
+export const transferTransaction: Transaction = {
+  id: 'tx-transfer',
+  description: 'Transferência p/ poupança',
+  amount: 300,
+  type: TransactionType.EXPENSE,
+  category: { id: 'cat-transfer', name: 'Transferência', isTransfer: true },
+  transactionDate: '2026-04-20T00:00:00.000Z',
+  dueDate: '2026-04-20T00:00:00.000Z',
+  updatedAt: '2026-04-20T00:00:00.000Z',
+  settled: true,
+};
+
+/**
+ * Simula o backend de cópia: para cada lançamento x mês de destino, mesmo dia do
+ * vencimento no mês alvo (com ajuste de fim de mês).
+ */
+export function buildCopyResult(payload: CopyTransactionsPayload): CopyTransactionsResult {
+  const byId = new Map(transactionsList.map((tx) => [tx.id, tx]));
+  const created = payload.targetMonths.flatMap((targetMonth) =>
+    payload.transactionIds.map((id) => {
+      const tx = byId.get(id)!;
+      const [y, m] = targetMonth.split('-').map(Number);
+      const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      const day = String(Math.min(Number(tx.dueDate.slice(8, 10)), lastDay)).padStart(2, '0');
+      return {
+        sourceId: id,
+        targetMonth,
+        description: tx.description,
+        amount: tx.amount,
+        type: tx.type,
+        dueDate: `${targetMonth}-${day}`,
+        transactionDate: `${targetMonth}-${tx.transactionDate.slice(8, 10)}`,
+      };
+    }),
+  );
+  return { dryRun: payload.dryRun ?? false, created, skipped: [] };
+}

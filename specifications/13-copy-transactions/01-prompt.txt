@@ -1,0 +1,42 @@
+Quero permitir copiar lançamentos do período exibido no dashboard para competências futuras.
+Depende do endpoint POST /transactions/copy do backend
+(js-mygoals-be/specifications/10-copy-transactions) — siga exatamente aquele contrato.
+
+Seleção no grid de transações:
+- Adicionar uma coluna de checkbox no início do grid e um checkbox no cabeçalho para
+  selecionar/desmarcar todas as linhas visíveis (respeitando o filtro de texto).
+- Lançamentos de categoria de transferência não podem ser copiados: o checkbox dessas linhas
+  fica desabilitado, com tooltip "Transferências não podem ser copiadas", e o "selecionar
+  todos" as ignora. Para isso, incluir isTransfer em TransactionCategory (o backend já
+  retorna esse campo na categoria).
+- A seleção é mantida ao trocar de página e ao filtrar, e é limpa ao trocar o mês.
+- Com pelo menos um item selecionado, exibir uma barra de ação acima do grid:
+  "N selecionados · Copiar para competências futuras · Limpar seleção".
+
+Modal de cópia (novo componente CopyTransactionsModal, padrão Container/View):
+- Escolha livre dos meses de destino (múltipla seleção de mês/ano), sem atalho de
+  "próximos N meses". Limite de 24 meses. Os meses escolhidos são listados e podem ser removidos.
+- Ao alterar a seleção de meses, buscar a prévia no backend com dryRun = true e mostrar,
+  agrupado por mês: descrição, valor, vencimento e data resultantes.
+- Duplicados (skipped com reason "duplicate") aparecem na prévia marcados como
+  "Já existe — será ignorado" e não contam no total.
+- Botão "Criar X lançamentos" (X = total de created da prévia), desabilitado quando X = 0
+  ou sem meses escolhidos. Ao confirmar, chamar com dryRun = false.
+- Exibir erros da API (400/404/500) dentro do modal, sem fechá-lo.
+- Após sucesso: fechar o modal, mostrar mensagem "X lançamentos criados" (e "Y ignorados por
+  já existirem", se houver), limpar a seleção e atualizar grid, cards de resumo e painel
+  (mesmo mecanismo de refreshKey usado na criação/edição).
+
+Implementação (seguir o CLAUDE.md):
+- Tipos CopyTransactionsPayload e CopyTransactionsResult em src/types/index.ts.
+- transactionsService.copy(payload).
+- Carregamento da prévia com useAsync.
+- Handlers e fixtures MSW para o novo endpoint (sucesso, duplicados, 400 de transferência, erro).
+
+Testes (happy e bad flows):
+- Seleção: selecionar/desmarcar linha, selecionar todos visíveis, transferência desabilitada,
+  seleção mantida na paginação e limpa ao trocar de mês, barra de ação.
+- Modal: escolha e remoção de meses, prévia agrupada, duplicados marcados, botão desabilitado
+  sem itens, confirmação com sucesso, erro da API exibido no modal.
+
+Atualize o README.md (Funcionalidades implementadas).
