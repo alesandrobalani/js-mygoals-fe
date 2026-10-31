@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import type { AccountSummary } from '../types';
 import { transactionsService } from '../services/transactions.service';
+import { useAsync } from '../hooks/useAsync';
 import { AccountsPanelView } from './AccountsPanel.view';
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-}
+import { formatCurrency } from '../utils/format';
 
 function balanceColor(value: number): string {
   return value >= 0 ? 'text-emerald-600' : 'text-red-500';
@@ -25,18 +23,22 @@ export function AccountsPanel({
   endDate: string;
   refreshKey?: number;
 }) {
-  const [accounts, setAccounts] = useState<AccountCard[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { data: accounts = [], loading, error } = useAsync(
+    () => transactionsService.getAccountSummary(endDate).then(toAccountCards),
+    [startDate, endDate, refreshKey],
+  );
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    Promise.all([
-      transactionsService.getAccountSummary(endDate)
-    ])
-      .then(([summaries]) => {
-        const cards = summaries
+  return (
+    <AccountsPanelView
+      accounts={accounts}
+      loading={loading}
+      error={error ? 'Erro ao carregar resumo de contas.' : ''}
+    />
+  );
+}
+
+function toAccountCards(summaries: AccountSummary[]): AccountCard[] {
+  return summaries
           .map((s) => {
             const settled = s.incomeSettled - s.expenseSettled;
             const estimated = (s.incomeSettled + s.incomeNotSettled) - (s.expenseSettled + s.expenseNotSettled);
@@ -50,13 +52,5 @@ export function AccountsPanel({
           })
           .filter((account) => account._settledRaw !== 0 || account._estimatedRaw !== 0)
           .sort((a, b) => b._settledRaw - a._settledRaw || b._estimatedRaw - a._estimatedRaw)
-          .map(({ _settledRaw, _estimatedRaw, ...card }) => card);
-
-        setAccounts(cards);
-      })
-      .catch(() => setError('Erro ao carregar resumo de contas.'))
-      .finally(() => setLoading(false));
-  }, [startDate, endDate, refreshKey]);
-
-  return <AccountsPanelView accounts={accounts} loading={loading} error={error} />;
+          .map(({ accountName, settled, estimated }) => ({ accountName, settled, estimated }));
 }

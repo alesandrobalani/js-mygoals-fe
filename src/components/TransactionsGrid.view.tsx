@@ -1,6 +1,6 @@
 import type { Transaction } from '../types';
 import { TransactionType } from '../types';
-
+import { formatCurrency } from '../utils/format';
 
 interface TransactionsGridViewProps {
   transactions: Transaction[];
@@ -14,10 +14,6 @@ interface TransactionsGridViewProps {
   onPageChange: (page: number) => void;
   onEditTransaction: (tx: Transaction) => void;
   onRemoveTransaction: (tx: Transaction) => void;
-}
-
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 export function TransactionsGridView({
@@ -36,14 +32,30 @@ export function TransactionsGridView({
     <div className="mt-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-slate-700">Transações do mês</h2>
-        <input
-          type="text"
-          value={filterText}
-          onChange={(e) => onFilterChange(e.target.value)}
-          placeholder="Filtrar transações..."
-          aria-label="Filtrar transações"
-          className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent w-64"
-        />
+        <div className="relative w-64">
+          <input
+            type="text"
+            value={filterText}
+            onChange={(e) => onFilterChange(e.target.value)}
+            placeholder="Filtrar transações..."
+            aria-label="Filtrar transações"
+            className="w-full px-3 py-1.5 pr-8 text-sm border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+          />
+          {filterText && (
+            <button
+              type="button"
+              onClick={() => onFilterChange('')}
+              aria-label="Limpar filtro"
+              title="Limpar filtro"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -62,20 +74,31 @@ export function TransactionsGridView({
             Nenhuma transação no período.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px] text-sm">
+          <table className="w-full table-fixed text-[11px] sm:text-xs md:text-sm">
+            <colgroup>
+              <col className="w-[9%]" />
+              <col className="w-[9%]" />
+              <col className="w-[20%]" />
+              <col className="w-[12%]" />
+              <col className="w-[6%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[10%]" />
+              <col className="w-[6%]" />
+              <col className="w-[4%]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Vencimento</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Data</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Descrição</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Conta</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Tipo</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Categoria</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Item</th>
-                <th className="text-right px-6 py-3 font-medium text-slate-600">Valor</th>
-                <th className="text-left px-6 py-3 font-medium text-slate-600">Efetivado</th>
-                <th className="px-4 py-3" />
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Vencimento</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Data</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Descrição</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Conta</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Tipo</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Categoria</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Item</th>
+                <th className="text-right px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Valor</th>
+                <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Efetivado</th>
+                <th className="px-1 md:px-4 py-2 md:py-3" />
               </tr>
             </thead>
             <tbody>
@@ -87,14 +110,14 @@ export function TransactionsGridView({
                     tx.type === TransactionType.INCOME ? 'bg-emerald-50/60' : 'bg-red-50/40',
                   ].join(' ')}
                 >
-                  <td className="px-6 py-4 text-slate-500">{tx.dueDate ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-500">{tx.transactionDate ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-800">{tx.description ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-800">{tx.account?.name ?? '—'}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-500 break-words">{tx.dueDate ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-500 break-words">{tx.transactionDate ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-800 truncate" title={tx.description ?? undefined}>{tx.description ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-800 break-words">{tx.account?.name ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4">
                     {tx.type === TransactionType.INCOME ? (
                       <span aria-label="Receita" title="Receita">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="16 12 12 8 8 12" />
                           <line x1="12" y1="16" x2="12" y2="8" />
@@ -102,7 +125,7 @@ export function TransactionsGridView({
                       </span>
                     ) : (
                       <span aria-label="Despesa" title="Despesa">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="8 12 12 16 16 12" />
                           <line x1="12" y1="8" x2="12" y2="16" />
@@ -110,33 +133,33 @@ export function TransactionsGridView({
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-slate-800">{tx.category?.name ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-800">{tx.transactionItem?.name ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-800 break-words">{tx.category?.name ?? '—'}</td>
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-800 break-words">{tx.transactionItem?.name ?? '—'}</td>
                   <td
-                    className={`px-6 py-4 text-right font-medium ${
+                    className={`px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-right font-medium break-words ${
                       tx.type === TransactionType.INCOME ? 'text-emerald-600' : 'text-red-500'
                     }`}
                   >
                     {formatCurrency(tx.amount)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4">
                     {tx.settled ? (
                       <span aria-label="Efetivado" title="Efetivado">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                           <polyline points="22 4 12 14.01 9 11.01" />
                         </svg>
                       </span>
                     ) : (
                       <span aria-label="Pendente" title="Pendente">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
                         </svg>
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-1 md:px-4 py-2 md:py-4">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onEditTransaction(tx)}
@@ -169,7 +192,6 @@ export function TransactionsGridView({
               ))}
             </tbody>
           </table>
-          </div>
         )}
       </div>
 

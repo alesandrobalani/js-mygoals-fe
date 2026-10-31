@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CategoryEntry, DateEntry, ItemEntry, TypeEntry } from './StrategicViewPage';
+import type { CategoryEntry, DateEntry, ItemEntry, TypeEntry } from '../utils/strategic-tree';
 
 interface MultiSelectProps {
   label: string;
