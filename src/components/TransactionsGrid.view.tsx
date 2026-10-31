@@ -14,9 +14,25 @@ interface TransactionsGridViewProps {
   onPageChange: (page: number) => void;
   onEditTransaction: (tx: Transaction) => void;
   onRemoveTransaction: (tx: Transaction) => void;
+  selectedIds: ReadonlyMap<string, unknown>;
+  isSelectable: (tx: Transaction) => boolean;
+  onToggleSelect: (tx: Transaction) => void;
+  onToggleSelectAll: () => void;
+  onOpenCopy: () => void;
+  onClearSelection: () => void;
+  copySuccessMessage: string;
+  onDismissCopySuccess: () => void;
 }
 
 export function TransactionsGridView({
+  selectedIds,
+  isSelectable,
+  onToggleSelect,
+  onToggleSelectAll,
+  onOpenCopy,
+  onClearSelection,
+  copySuccessMessage,
+  onDismissCopySuccess,
   transactions,
   page,
   totalPages,
@@ -28,6 +44,12 @@ export function TransactionsGridView({
   onEditTransaction,
   onRemoveTransaction,
 }: TransactionsGridViewProps) {
+  const selectedCount = selectedIds.size;
+  const selectableVisible = transactions.filter(isSelectable);
+  const visibleSelected = selectableVisible.filter((tx) => selectedIds.has(tx.id)).length;
+  const allVisibleSelected = selectableVisible.length > 0 && visibleSelected === selectableVisible.length;
+  const someVisibleSelected = visibleSelected > 0 && !allVisibleSelected;
+
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between mb-4">
@@ -64,6 +86,52 @@ export function TransactionsGridView({
         </div>
       )}
 
+      {copySuccessMessage && (
+        <div
+          role="status"
+          className="mb-4 flex items-center justify-between gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700"
+        >
+          <span>{copySuccessMessage}</span>
+          <button
+            type="button"
+            onClick={onDismissCopySuccess}
+            aria-label="Fechar aviso"
+            className="p-0.5 rounded hover:bg-emerald-100"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {selectedCount > 0 && (
+        <div
+          role="toolbar"
+          aria-label="Ações da seleção"
+          className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 bg-sky-50 border border-sky-200 rounded-lg text-sm"
+        >
+          <span className="font-medium text-sky-800">
+            {selectedCount} {selectedCount === 1 ? 'selecionado' : 'selecionados'}
+          </span>
+          <button
+            type="button"
+            onClick={onOpenCopy}
+            className="px-3 py-1 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition-colors"
+          >
+            Copiar para competências futuras
+          </button>
+          <button
+            type="button"
+            onClick={onClearSelection}
+            className="px-2 py-1 rounded-lg text-sky-700 hover:bg-sky-100 transition-colors"
+          >
+            Limpar seleção
+          </button>
+        </div>
+      )}
+
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
@@ -76,19 +144,33 @@ export function TransactionsGridView({
         ) : (
           <table className="w-full table-fixed text-[11px] sm:text-xs md:text-sm">
             <colgroup>
+              <col className="w-[4%]" />
               <col className="w-[9%]" />
               <col className="w-[9%]" />
-              <col className="w-[20%]" />
+              <col className="w-[13%]" />
               <col className="w-[12%]" />
               <col className="w-[6%]" />
               <col className="w-[12%]" />
               <col className="w-[12%]" />
               <col className="w-[10%]" />
               <col className="w-[6%]" />
-              <col className="w-[4%]" />
+              <col className="w-[7%]" />
             </colgroup>
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="px-1 md:px-3 py-2 md:py-3 text-center">
+                  <input
+                    type="checkbox"
+                    aria-label="Selecionar todos os lançamentos visíveis"
+                    checked={allVisibleSelected}
+                    disabled={selectableVisible.length === 0}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someVisibleSelected;
+                    }}
+                    onChange={onToggleSelectAll}
+                    className="w-3.5 h-3.5 md:w-4 md:h-4 accent-sky-600 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                </th>
                 <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Vencimento</th>
                 <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Data</th>
                 <th className="text-left px-1.5 sm:px-3 md:px-6 py-2 md:py-3 font-medium text-slate-600 break-words">Descrição</th>
@@ -110,6 +192,26 @@ export function TransactionsGridView({
                     tx.type === TransactionType.INCOME ? 'bg-emerald-50/60' : 'bg-red-50/40',
                   ].join(' ')}
                 >
+                  <td className="px-1 md:px-3 py-2 md:py-4 text-center">
+                    {isSelectable(tx) ? (
+                      <input
+                        type="checkbox"
+                        aria-label={`Selecionar ${tx.description ?? 'lançamento'}`}
+                        checked={selectedIds.has(tx.id)}
+                        onChange={() => onToggleSelect(tx)}
+                        className="w-3.5 h-3.5 md:w-4 md:h-4 accent-sky-600 cursor-pointer"
+                      />
+                    ) : (
+                      <span title="Transferências não podem ser copiadas">
+                        <input
+                          type="checkbox"
+                          aria-label={`${tx.description ?? 'Lançamento'}: transferências não podem ser copiadas`}
+                          disabled
+                          className="w-3.5 h-3.5 md:w-4 md:h-4 cursor-not-allowed opacity-40"
+                        />
+                      </span>
+                    )}
+                  </td>
                   <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-500 break-words">{tx.dueDate ?? '—'}</td>
                   <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-500 break-words">{tx.transactionDate ?? '—'}</td>
                   <td className="px-1.5 sm:px-3 md:px-6 py-2 md:py-4 text-slate-800 truncate" title={tx.description ?? undefined}>{tx.description ?? '—'}</td>
@@ -159,13 +261,13 @@ export function TransactionsGridView({
                       </span>
                     )}
                   </td>
-                  <td className="px-1 md:px-4 py-2 md:py-4">
-                    <div className="flex items-center gap-1">
+                  <td className="px-0.5 md:px-1 py-2 md:py-4">
+                    <div className="flex flex-col xl:flex-row items-center justify-center gap-1">
                       <button
                         onClick={() => onEditTransaction(tx)}
                         aria-label="Editar transação"
                         title="Editar"
-                        className="p-1 rounded text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors"
+                        className="p-0.5 md:p-1 rounded text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -176,7 +278,7 @@ export function TransactionsGridView({
                         onClick={() => onRemoveTransaction(tx)}
                         aria-label="Remover transação"
                         title="Remover"
-                        className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="p-0.5 md:p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="3 6 5 6 21 6" />

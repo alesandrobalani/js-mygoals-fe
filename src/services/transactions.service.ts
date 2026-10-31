@@ -1,5 +1,5 @@
 import api from './api';
-import type { AccountSummary, CreateTransactionPayload, PaginatedTransactions, StrategicViewTransaction, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
+import type { AccountSummary, CopyTransactionsPayload, CopyTransactionsResult, CreateTransactionPayload, PaginatedTransactions, StrategicViewTransaction, Transaction, TransactionSummary, UpdateTransactionPayload } from '../types';
 
 export const transactionsService = {
   async getSummary(startDate: string, endDate: string): Promise<TransactionSummary> {
@@ -49,4 +49,9 @@ export const transactionsService = {
     return data;
   },
 
+  /** Copia lançamentos para competências futuras. Com `dryRun`, só calcula a prévia. */
+  async copy(payload: CopyTransactionsPayload): Promise<CopyTransactionsResult> {
+    const { data } = await api.post<CopyTransactionsResult>('/transactions/copy', payload);
+    return data;
+  },
 };

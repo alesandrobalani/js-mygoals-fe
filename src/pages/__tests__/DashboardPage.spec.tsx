@@ -164,4 +164,30 @@ describe('DashboardPage', () => {
       });
     });
   });
+
+  describe('copy transactions', () => {
+    it('keeps the success notice visible while the summary reloads after a copy', async () => {
+      let summaryCalls = 0;
+      server.use(
+        http.get('http://localhost:3000/transactions/summary', () => {
+          summaryCalls++;
+          return HttpResponse.json(transactionSummary);
+        }),
+      );
+      renderWithProviders(<DashboardPage />);
+      await waitFor(() => expect(screen.getByText('Salário')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Selecionar Supermercado' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Copiar para competências futuras' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Adicionar mês' }));
+      const confirm = await screen.findByRole('button', { name: 'Criar 1 lançamento' });
+      await waitFor(() => expect(confirm).toBeEnabled());
+      await userEvent.click(confirm);
+
+      expect(await screen.findByRole('status')).toHaveTextContent('1 lançamento criado');
+      await waitFor(() => expect(summaryCalls).toBe(2));
+      // a página não foi trocada pelo spinner: o aviso continua lá após a recarga
+      expect(screen.getByRole('status')).toHaveTextContent('1 lançamento criado');
+    });
+  });
 });

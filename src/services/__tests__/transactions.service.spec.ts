@@ -116,4 +116,44 @@ describe('transactionsService', () => {
     });
   });
 
+  describe('copy', () => {
+    it('posts the payload and returns the copy result', async () => {
+      let body: unknown;
+      server.use(
+        http.post('http://localhost:3000/transactions/copy', async ({ request }) => {
+          body = await request.json();
+          return HttpResponse.json({ dryRun: true, created: [], skipped: [] });
+        }),
+      );
+
+      const payload = { transactionIds: ['tx-2'], targetMonths: ['2026-05'], dryRun: true };
+      const result = await transactionsService.copy(payload);
+
+      expect(body).toEqual(payload);
+      expect(result).toEqual({ dryRun: true, created: [], skipped: [] });
+    });
+
+    it('returns one created item per transaction and target month', async () => {
+      const result = await transactionsService.copy({
+        transactionIds: ['tx-2', 'tx-3'],
+        targetMonths: ['2026-05', '2026-06'],
+      });
+
+      expect(result.dryRun).toBe(false);
+      expect(result.created).toHaveLength(4);
+      expect(result.created[0]).toMatchObject({ sourceId: 'tx-2', targetMonth: '2026-05', dueDate: '2026-05-10' });
+    });
+
+    it('throws when the backend rejects transfers with 400', async () => {
+      server.use(
+        http.post('http://localhost:3000/transactions/copy', () =>
+          HttpResponse.json({ message: 'Transfer transactions cannot be copied', transferIds: ['tx-x'] }, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        transactionsService.copy({ transactionIds: ['tx-x'], targetMonths: ['2026-05'] }),
+      ).rejects.toThrow();
+    });
+  });
 });

@@ -21,6 +21,7 @@ Frontend do sistema de controle financeiro familiar **MyGoals**.
 - Criação e edição de transações via modal no dashboard (com atualização automática do grid e resumo)
 - Remoção de transação com confirmação (atualiza grid e resumo após exclusão)
 - Criação rápida de categoria, conta e item inline no modal de transação
+- **Cópia de lançamentos para competências futuras**: seleção de lançamentos no grid (checkbox por linha e "selecionar todos" das linhas visíveis, mantida entre páginas), escolha livre de até 24 meses posteriores ao exibido, prévia por mês antes de confirmar e criação das cópias como não efetivadas. Vencimento e data são levados ao mesmo dia no mês de destino (ajustados ao fim do mês quando necessário); lançamentos idênticos já existentes são ignorados e transferências não podem ser copiadas
 
 ## Pré-requisitos
 

@@ -63,7 +63,10 @@ export function DashboardPage() {
     setEditingTransaction(null);
   }
 
-  if (loading) {
+  // Spinner de página só na primeira carga. Nas recargas (troca de mês, criação,
+  // edição, exclusão, cópia) a página continua montada com os valores anteriores:
+  // assim o grid não perde estado (aviso de cópia, seleção) nem o scroll.
+  if (loading && !summary) {
     return (
       <div className="flex justify-center py-16">
         <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
@@ -101,6 +104,7 @@ export function DashboardPage() {
             endDate={endDate}
             onEditTransaction={handleEditTransaction}
             onDeleteSuccess={() => setRefreshKey((k) => k + 1)}
+            onCopySuccess={() => setRefreshKey((k) => k + 1)}
           />
         </div>
         <div className="w-full lg:w-80 shrink-0">
